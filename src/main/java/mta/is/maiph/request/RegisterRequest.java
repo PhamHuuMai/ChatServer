@@ -16,7 +16,6 @@ import lombok.ToString;
  */
 @Setter
 @Getter
-@AllArgsConstructor
 @ToString
 public class RegisterRequest {
     String email;

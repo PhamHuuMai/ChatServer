@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 @Setter
 @Getter
-@AllArgsConstructor
 @ToString
 public class LoginRequest {
 

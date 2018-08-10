@@ -15,6 +15,6 @@ public class WebServiceConfig implements WebMvcConfigurer {
  
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**");
+        registry.addMapping("/**").allowedOrigins("https://chatserver-maiph.herokuapp.com");
     }
 }  

@@ -21,6 +21,7 @@ public class ExceptionHandle {
     }
     @ExceptionHandler(Exception.class)
     public ResponseEntity common(Exception ex) { 
+        ex.printStackTrace();
         Response response = new Response(ErrorCode.UNKNOW_ERROR);
         return new ResponseEntity(response,HttpStatus.OK);
     }

@@ -39,33 +39,34 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginRequest loginRequest) throws Exception { 
+    public ResponseEntity login(@RequestBody LoginRequest loginRequest) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
         User user = userRepository.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPasswordMd5());
-        if(user == null){
-           throw new ApplicationException(ErrorCode.INVALID_ACCOUNT);
+        if (user == null) {
+            throw new ApplicationException(ErrorCode.INVALID_ACCOUNT);
         }
         String token = TokenFactory.generateRandomToken();
-        SessionManager.add(token, user.getId());        
-        response.setData(new LoginResponse(token,user.getEmail()));
-        return new ResponseEntity(response,HttpStatus.OK);
+        SessionManager.add(token, user.getId());
+        response.setData(new LoginResponse(token, user.getEmail()));
+        return new ResponseEntity(response, HttpStatus.OK);
     }
+
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody RegisterRequest regRequest) throws Exception { 
+    public ResponseEntity register(@RequestBody RegisterRequest regRequest) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
         User user = userRepository.findByEmail(regRequest.getEmail());
-        if(user != null){
-           throw new ApplicationException(ErrorCode.INVALID_ACCOUNT);
+        if (user != null) {
+            throw new ApplicationException(ErrorCode.INVALID_ACCOUNT);
         }
         String originalPass = regRequest.getPassword();
         String password = Util.MD5(originalPass);
         user = new User(null, regRequest.getEmail(), originalPass, password);
         User result = userRepository.insert(user);
-        
+
         String token = TokenFactory.generateRandomToken();
-        SessionManager.add(token, result.getId());        
-        response.setData(new LoginResponse(token,user.getEmail()));
-        return new ResponseEntity(response,HttpStatus.OK);
+        SessionManager.add(token, result.getId());
+        response.setData(new LoginResponse(token, user.getEmail()));
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
 }
