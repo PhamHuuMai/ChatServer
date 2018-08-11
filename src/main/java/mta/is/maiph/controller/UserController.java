@@ -5,6 +5,7 @@
  */
 package mta.is.maiph.controller;
 
+import java.util.List;
 import mta.is.maiph.constant.ErrorCode;
 import mta.is.maiph.entity.User;
 import mta.is.maiph.exception.ApplicationException;
@@ -41,7 +42,8 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequest loginRequest) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
-        User user = userRepository.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPasswordMd5());
+        List<User> users = userRepository.findAll();
+        User user = userRepository.findByEmailAndPassword(loginRequest.getEmail(),loginRequest.getPasswordMd5());
         if (user == null) {
             throw new ApplicationException(ErrorCode.INVALID_ACCOUNT);
         }
