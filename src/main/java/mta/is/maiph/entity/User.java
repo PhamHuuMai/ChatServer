@@ -28,4 +28,6 @@ public class User {
     String originalPassword;
     @Field(value = "password")
     String password;
+    @Field(value = "last_time_login")
+    String lastLogin;
 }

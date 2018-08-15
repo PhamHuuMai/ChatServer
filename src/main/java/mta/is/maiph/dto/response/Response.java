@@ -1,4 +1,4 @@
-package mta.is.maiph.response;
+package mta.is.maiph.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

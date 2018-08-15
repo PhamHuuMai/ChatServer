@@ -1,4 +1,4 @@
-package mta.is.maiph.request;
+package mta.is.maiph.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

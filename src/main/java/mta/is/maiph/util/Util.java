@@ -5,6 +5,8 @@
  */
 package mta.is.maiph.util;
 
+import java.util.Date;
+
 /**
  *
  * @author MaiPH
@@ -23,5 +25,18 @@ public class Util {
         } catch (java.security.NoSuchAlgorithmException e) {
         }
         return null;
+    }
+
+    public static String currentTIme_yyyyMMddhhmmss(){
+        Date date = new Date(System.currentTimeMillis());
+        StringBuilder time = new StringBuilder();
+        time.append(date.getYear());
+        time.append(date.getMonth());
+        time.append(date.getDate());
+        time.append(date.getHours());
+        time.append(date.getMinutes());
+        time.append(date.getSeconds());
+        
+        return time.toString();
     }
 }

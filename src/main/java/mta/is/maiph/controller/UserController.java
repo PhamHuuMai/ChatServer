@@ -5,15 +5,18 @@
  */
 package mta.is.maiph.controller;
 
+import com.sun.javafx.scene.control.skin.VirtualFlow;
+import java.util.LinkedList;
 import java.util.List;
 import mta.is.maiph.constant.ErrorCode;
 import mta.is.maiph.entity.User;
 import mta.is.maiph.exception.ApplicationException;
 import mta.is.maiph.repository.UserRepository;
-import mta.is.maiph.request.LoginRequest;
-import mta.is.maiph.request.RegisterRequest;
-import mta.is.maiph.response.LoginResponse;
-import mta.is.maiph.response.Response;
+import mta.is.maiph.dto.request.LoginRequest;
+import mta.is.maiph.dto.request.RegisterRequest;
+import mta.is.maiph.dto.response.LoginResponse;
+import mta.is.maiph.dto.response.Response;
+import mta.is.maiph.dto.response.UserResponse;
 import mta.is.maiph.session.SessionManager;
 import mta.is.maiph.session.TokenFactory;
 import mta.is.maiph.util.Util;
@@ -22,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -62,12 +66,25 @@ public class UserController {
         }
         String originalPass = regRequest.getPassword();
         String password = Util.MD5(originalPass);
-        user = new User(null, regRequest.getEmail(), originalPass, password);
+        user = new User(null, regRequest.getEmail(), originalPass, password,Util.currentTIme_yyyyMMddhhmmss());
         User result = userRepository.insert(user);
 
         String token = TokenFactory.generateRandomToken();
         SessionManager.add(token, result.getId());
         response.setData(new LoginResponse(token, user.getEmail()));
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+    
+    @PostMapping("/getAllUser")
+    public ResponseEntity register(@RequestHeader(name = "Authorization") String token) throws Exception {
+        Response response = new Response(ErrorCode.SUCCESS);
+        String userId = SessionManager.check(token);
+        List<User> users = userRepository.findAll();
+        List<UserResponse> userResponse = new LinkedList<>();
+        for (User user : users) {
+            userResponse.add(new UserResponse(user));
+        }
+        response.setData(userResponse);
         return new ResponseEntity(response, HttpStatus.OK);
     }
 

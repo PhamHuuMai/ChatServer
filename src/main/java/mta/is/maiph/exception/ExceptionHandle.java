@@ -1,7 +1,7 @@
 package mta.is.maiph.exception;
 
 import mta.is.maiph.constant.ErrorCode;
-import mta.is.maiph.response.Response;
+import mta.is.maiph.dto.response.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

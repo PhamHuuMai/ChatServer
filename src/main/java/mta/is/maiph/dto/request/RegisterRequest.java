@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mta.is.maiph.request;
+package mta.is.maiph.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
