@@ -62,4 +62,7 @@ public class WebsocketSessionManager  {
         return ws;
     }
 
+    public static String getUserId(String sessionId){
+       return (String)pool2.get(sessionId);
+    }
 }
