@@ -18,6 +18,7 @@ import lombok.ToString;
 @Getter
 @ToString
 public class RegisterRequest {
+    String name;
     String email;
     String password;
 }

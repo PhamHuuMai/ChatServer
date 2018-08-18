@@ -64,7 +64,7 @@ public class UserController {
         }
         String originalPass = regRequest.getPassword();
         String password = Util.MD5(originalPass);
-        user = new User(null, regRequest.getEmail(), originalPass, password,Util.currentTIme_yyyyMMddhhmmss());
+        user = new User(null, regRequest.getName(), regRequest.getEmail(), originalPass, password,Util.currentTIme_yyyyMMddhhmmss());
         User result = userRepository.insert(user);
 
         String token = TokenFactory.generateRandomToken();

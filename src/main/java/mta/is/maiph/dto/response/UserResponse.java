@@ -23,7 +23,7 @@ public class UserResponse {
     String lastLoginTIme;
     public UserResponse(User user){
        userId = user.getId();
-       userName = user.getEmail();
+       userName = user.getName();
        lastLoginTIme = user.getLastLogin();
     }
     

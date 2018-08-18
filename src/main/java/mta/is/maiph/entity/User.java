@@ -22,6 +22,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class User {
     @Id
     String id;
+    @Field(value = "name")
+    String name;
     @Field(value = "email")
     String email;
     @Field(value = "original_password")
