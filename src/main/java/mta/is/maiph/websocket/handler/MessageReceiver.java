@@ -1,5 +1,6 @@
 package mta.is.maiph.websocket.handler;
 
+import mta.is.maiph.DAO.impl.MessageDAO;
 import mta.is.maiph.dto.connection.Message;
 import mta.is.maiph.session.SessionManager;
 import mta.is.maiph.websocket.entrypointchat.ReccieveMessageEntryPoint;
@@ -55,7 +56,7 @@ public class MessageReceiver extends TextWebSocketHandler{
             String value = (String)msgJson.get("value");
             Message msgDTO = new Message(userId, toConversation, msgType, value);
             ReccieveMessageEntryPoint.add(msgDTO);
-            
+            (new MessageDAO()).add(toConversation, userId, value);
         }        
         
 
