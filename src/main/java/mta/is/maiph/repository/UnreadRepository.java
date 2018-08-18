@@ -5,7 +5,9 @@
  */
 package mta.is.maiph.repository;
 
+import java.util.List;
 import mta.is.maiph.entity.UnreadMessage;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 /**
@@ -13,5 +15,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
  * @author MaiPH
  */
 public interface UnreadRepository extends MongoRepository<UnreadMessage, String> {
+
+    public List<UnreadMessage> findByUserId(String userId);
        
 }

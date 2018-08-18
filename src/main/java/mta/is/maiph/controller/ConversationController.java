@@ -49,7 +49,7 @@ public class ConversationController {
         cvs.setMembers(Arrays.asList(userId, memeberId));
         cvs.setName("new conversation");
         Conversation result = conversationRepository.insert(cvs);
-        unreadRepository.insert(new UnreadMessage(userId, userId, result.getId(), "new conversation", 0));
+        unreadRepository.insert(new UnreadMessage(null, userId, result.getId(), "new conversation", 0));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
@@ -57,7 +57,7 @@ public class ConversationController {
     public ResponseEntity getAllConversation(@RequestHeader(name = "Authorization") String token) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.check(token);
-        List<UnreadMessage> allConversation = (List<UnreadMessage>) unreadRepository.findAllById(Arrays.asList(userId));
+        List<UnreadMessage> allConversation = (List<UnreadMessage>) unreadRepository.findByUserId(userId);
         List<ConversationResponse> result = new LinkedList<>();
         for (UnreadMessage um : allConversation) {
             Conversation cvs = conversationRepository.findById(um.getConversationId()).get();
