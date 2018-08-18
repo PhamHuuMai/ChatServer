@@ -50,7 +50,7 @@ public class ConversationController {
         
         // 
         User user = userRepository.findById(userId).get();
-        User friend = userRepository.findById(userId).get();
+        User friend = userRepository.findById(memeberId).get();
         //
         Conversation cvs = new Conversation();
         cvs.setAdminId(userId);
