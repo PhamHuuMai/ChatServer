@@ -34,7 +34,6 @@ public class DirectMessageWorker extends Thread{
            Conversation cvs = conversationRepository.findById(cvsId).get();
            // send to all member in conversation
            List<String> mem = cvs.getMembers();
-           mem.remove(msg.getFromId());
            JSONObject json = new  JSONObject();
            json.put("value",msg.getMessageValue());
            json.put("to",cvsId);
