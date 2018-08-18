@@ -44,4 +44,7 @@ public class Conversation {
     
     @Field(value = "num_member")
     int numMember;
+    
+    @Field(value = "is_group")
+    boolean isGroup;
 }

@@ -9,8 +9,10 @@ import mta.is.maiph.dto.response.ConversationResponse;
 import mta.is.maiph.dto.response.Response;
 import mta.is.maiph.entity.Conversation;
 import mta.is.maiph.entity.UnreadMessage;
+import mta.is.maiph.entity.User;
 import mta.is.maiph.repository.ConversationRepository;
 import mta.is.maiph.repository.UnreadRepository;
+import mta.is.maiph.repository.UserRepository;
 import mta.is.maiph.session.SessionManager;
 import mta.is.maiph.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +31,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConversationController {
 
     private ConversationRepository conversationRepository;
-    private UnreadRepository unreadRepository;
-
+    private UnreadRepository unreadRepository; 
+    private UserRepository userRepository;
+    
     @Autowired
-    public ConversationController(ConversationRepository conversationRepository, UnreadRepository unreadRepository) {
+    public ConversationController(ConversationRepository conversationRepository, UnreadRepository unreadRepository,UserRepository userRepository) {
         this.conversationRepository = conversationRepository;
         this.unreadRepository = unreadRepository;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/addconversation")
@@ -42,14 +46,24 @@ public class ConversationController {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.check(token);
         String memeberId = addConversationRequest.getMemberId();
+        // 
+        
+        // 
+        User user = userRepository.findById(userId).get();
+        User friend = userRepository.findById(userId).get();
+        //
         Conversation cvs = new Conversation();
         cvs.setAdminId(userId);
         cvs.setLastChat(Util.currentTIme_yyyyMMddhhmmss());
         cvs.setCreateTime(Util.currentTIme_yyyyMMddhhmmss());
         cvs.setMembers(Arrays.asList(userId, memeberId));
         cvs.setName("new conversation");
+        cvs.setGroup(false);
         Conversation result = conversationRepository.insert(cvs);
-        unreadRepository.insert(new UnreadMessage(null, userId, result.getId(), "new conversation", 0));
+        //
+        unreadRepository.insert(new UnreadMessage(null, userId, result.getId(), friend.getName(), 0));
+        unreadRepository.insert(new UnreadMessage(null, memeberId, result.getId(), user.getName(), 0));
+        //
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
