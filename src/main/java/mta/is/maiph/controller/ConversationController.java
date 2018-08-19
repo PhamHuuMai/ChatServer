@@ -3,11 +3,16 @@ package mta.is.maiph.controller;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import mta.is.maiph.DAO.impl.ContactTrackingDAO;
+import mta.is.maiph.DAO.impl.MessageDAO;
+import mta.is.maiph.DAO.impl.UnreadMsgDAO;
 import mta.is.maiph.constant.ErrorCode;
 import mta.is.maiph.dto.request.AddConversationRequest;
+import mta.is.maiph.dto.request.GetContenCvstRequest;
 import mta.is.maiph.dto.response.ConversationResponse;
 import mta.is.maiph.dto.response.Response;
 import mta.is.maiph.entity.Conversation;
+import mta.is.maiph.entity.Message;
 import mta.is.maiph.entity.UnreadMessage;
 import mta.is.maiph.entity.User;
 import mta.is.maiph.repository.ConversationRepository;
@@ -33,7 +38,9 @@ public class ConversationController {
     private ConversationRepository conversationRepository;
     private UnreadRepository unreadRepository; 
     private UserRepository userRepository;
-    
+    private ContactTrackingDAO ct = new ContactTrackingDAO();
+    private MessageDAO msgDAO = new MessageDAO();
+    private UnreadMsgDAO unReadMsgDAO = new UnreadMsgDAO();
     @Autowired
     public ConversationController(ConversationRepository conversationRepository, UnreadRepository unreadRepository,UserRepository userRepository) {
         this.conversationRepository = conversationRepository;
@@ -47,8 +54,13 @@ public class ConversationController {
         String userId = SessionManager.check(token);
         String memeberId = addConversationRequest.getMemberId();
         // 
-        
+        if( userId.equals(memeberId) || ct.contacted(userId, memeberId)){
+            System.out.println("==============================");
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
         // 
+        ct.add(userId, memeberId);
+        ct.add(memeberId, userId);
         User user = userRepository.findById(userId).get();
         User friend = userRepository.findById(memeberId).get();
         //
@@ -85,4 +97,15 @@ public class ConversationController {
         response.setData(result);
         return new ResponseEntity(response, HttpStatus.OK);
     }
+    @PostMapping("/getconversationcontent")
+    public ResponseEntity getConversationContent(@RequestBody GetContenCvstRequest request,@RequestHeader(name = "Authorization") String token) throws Exception {
+        Response response = new Response(ErrorCode.SUCCESS);
+        String userId = SessionManager.check(token);
+        String cvsId = request.getCvsId();
+        List<Message> result = msgDAO.getAllContent(cvsId);
+        unReadMsgDAO.read(userId, cvsId);
+        response.setData(result);
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
 }

@@ -23,4 +23,7 @@ public class ReccieveMessageEntryPoint {
     public static Message pool() {
         return pool.poll();
     }
+    public static boolean isEmpty() {
+        return pool.isEmpty();
+    }
 }

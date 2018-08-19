@@ -51,7 +51,7 @@ public class UserController {
         }
         String token = TokenFactory.generateRandomToken();
         SessionManager.add(token, user.getId());
-        response.setData(new LoginResponse(token, user.getEmail()));
+        response.setData(new LoginResponse(token, user.getEmail(),user.getId()));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
@@ -69,7 +69,7 @@ public class UserController {
 
         String token = TokenFactory.generateRandomToken();
         SessionManager.add(token, result.getId());
-        response.setData(new LoginResponse(token, user.getEmail()));
+        response.setData(new LoginResponse(token, user.getEmail(),result.getId()));
         return new ResponseEntity(response, HttpStatus.OK);
     }
     
