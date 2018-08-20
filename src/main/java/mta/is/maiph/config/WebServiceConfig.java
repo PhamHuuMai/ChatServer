@@ -15,6 +15,7 @@ public class WebServiceConfig implements WebMvcConfigurer {
  
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").allowedOrigins("https://chat-static-server.herokuapp.com","http://127.0.0.1:8080");
+//        registry.addMapping("/**").allowedOrigins("https://chat-static-server.herokuapp.com","http://127.0.0.1:8080",);
+            registry.addMapping("/**").allowedOrigins("*");
     }
 }  
