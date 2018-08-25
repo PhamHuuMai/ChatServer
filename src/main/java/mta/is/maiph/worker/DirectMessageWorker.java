@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mta.is.maiph.DAO.impl.ConversationDAO;
+import mta.is.maiph.DAO.impl.UserDAO;
 import mta.is.maiph.dto.connection.Message;
 import mta.is.maiph.entity.Conversation;
 import mta.is.maiph.entity.User;
@@ -30,14 +31,7 @@ import org.springframework.web.socket.WebSocketSession;
 @Service
 public class DirectMessageWorker extends Thread {
 
-    private ConversationRepository conversationRepository;
-    private UserRepository userRepository;
-
-    @Autowired
-    public DirectMessageWorker(ConversationRepository conversationRepository,UserRepository userRepository) {
-        this.conversationRepository = conversationRepository;
-        this.userRepository = this.userRepository;
-    }
+    private UserDAO userDAO = new UserDAO();
 
     @Override
     public void run() {
@@ -51,7 +45,7 @@ public class DirectMessageWorker extends Thread {
                 // get to conversation
                 String cvsId = msg.getToConversationId();
                 String fromId = msg.getFromId();
-                User fromUser = userRepository.findById(fromId).get();
+                String fromUsername = userDAO.getUserNameById(fromId);
                 System.out.println(cvsId);
                 // get all member in conversation
                 ConversationDAO cvtDAO = new ConversationDAO();
@@ -62,7 +56,7 @@ public class DirectMessageWorker extends Thread {
                 json.put("value", msg.getMessageValue());
                 json.put("to", cvsId);
                 json.put("from", msg.getFromId());
-                json.put("name", fromUser.getName());
+                json.put("name", fromUsername);
                 for (String id : mem) {
                     List<WebSocketSession> des = WebsocketSessionManager.get(id);
                     for (WebSocketSession de : des) {

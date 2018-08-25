@@ -17,6 +17,6 @@ public class ChatServerApplication {
     
     public static void main(String[] args) {
         SpringApplication.run(ChatServerApplication.class, args);
-        (new DirectMessageWorker(conversationRepository,userRepository)).start();
+        (new DirectMessageWorker()).start();
     }
 }
