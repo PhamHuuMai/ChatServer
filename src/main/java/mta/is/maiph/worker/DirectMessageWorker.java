@@ -51,6 +51,7 @@ public class DirectMessageWorker extends Thread{
            // send to all member in conversation
            List<String> mem = cvtDAO.getListMem(cvsId);
            JSONObject json = new  JSONObject();
+           json.put("msg_type",msg.getMessageType());
            json.put("value",msg.getMessageValue());
            json.put("to",cvsId);
            json.put("from",msg.getFromId());

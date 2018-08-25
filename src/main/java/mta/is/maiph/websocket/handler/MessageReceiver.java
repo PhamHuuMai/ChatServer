@@ -66,6 +66,11 @@ public class MessageReceiver extends TextWebSocketHandler {
                 for (String mem : mems) {
                     (new UnreadMsgDAO()).incUnread(mem, toConversation);
                 }
+            } else if (msgType == 2) {
+                String userId = WebsocketSessionManager.getUserId(session.getId());
+                String toConversation = (String) msgJson.get("to");
+                Message msgDTO = new Message(userId, toConversation, msgType.intValue(), "");
+                ReccieveMessageEntryPoint.add(msgDTO);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
