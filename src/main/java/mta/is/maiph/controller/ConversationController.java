@@ -35,27 +35,28 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController()
 public class ConversationController {
-
+    
     private ConversationRepository conversationRepository;
-    private UnreadRepository unreadRepository; 
+    private UnreadRepository unreadRepository;    
     private UserRepository userRepository;
     private ContactTrackingDAO ct = new ContactTrackingDAO();
     private MessageDAO msgDAO = new MessageDAO();
     private UnreadMsgDAO unReadMsgDAO = new UnreadMsgDAO();
+
     @Autowired
-    public ConversationController(ConversationRepository conversationRepository, UnreadRepository unreadRepository,UserRepository userRepository) {
+    public ConversationController(ConversationRepository conversationRepository, UnreadRepository unreadRepository, UserRepository userRepository) {
         this.conversationRepository = conversationRepository;
         this.unreadRepository = unreadRepository;
         this.userRepository = userRepository;
     }
-
+    
     @PostMapping("/addconversation")
     public ResponseEntity addConversation(@RequestBody AddConversationRequest addConversationRequest, @RequestHeader(name = "Authorization") String token) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.check(token);
         String memeberId = addConversationRequest.getMemberId();
         // 
-        if( userId.equals(memeberId) || ct.contacted(userId, memeberId)){
+        if (userId.equals(memeberId) || ct.contacted(userId, memeberId)) {
             System.out.println("==============================");
             return new ResponseEntity(response, HttpStatus.OK);
         }
@@ -79,7 +80,7 @@ public class ConversationController {
         //
         return new ResponseEntity(response, HttpStatus.OK);
     }
-
+    
     @PostMapping("/getallconversation")
     public ResponseEntity getAllConversation(@RequestHeader(name = "Authorization") String token) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
@@ -98,8 +99,9 @@ public class ConversationController {
         response.setData(result);
         return new ResponseEntity(response, HttpStatus.OK);
     }
+
     @PostMapping("/getconversationcontent")
-    public ResponseEntity getConversationAllContent(@RequestBody GetContenCvstRequest request,@RequestHeader(name = "Authorization") String token) throws Exception {
+    public ResponseEntity getConversationAllContent(@RequestBody GetContenCvstRequest request, @RequestHeader(name = "Authorization") String token) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.check(token);
         String cvsId = request.getCvsId();
@@ -108,17 +110,23 @@ public class ConversationController {
         response.setData(result);
         return new ResponseEntity(response, HttpStatus.OK);
     }
+
     @PostMapping("/getconversationcontent/v2")
-    public ResponseEntity getConversationContent(@RequestBody GetContenCvstRequest request,@RequestHeader(name = "Authorization") String token) throws Exception {
+    public ResponseEntity getConversationContent(@RequestBody GetContenCvstRequest request, @RequestHeader(name = "Authorization") String token) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.check(token);
         int skip = request.getSkip();
         int take = request.getTake();
         String cvsId = request.getCvsId();
-        List<Message> result = msgDAO.getContent(cvsId,skip,take);
+        List<Message> result = msgDAO.getContent(cvsId, skip, take);
+        result.forEach((t) -> {
+            String msgOwner = t.getUserId();
+            User u = userRepository.findById(msgOwner).get();
+            t.setName(u.getName());
+        });
         unReadMsgDAO.read(userId, cvsId);
         response.setData(result);
         return new ResponseEntity(response, HttpStatus.OK);
     }
-
+    
 }

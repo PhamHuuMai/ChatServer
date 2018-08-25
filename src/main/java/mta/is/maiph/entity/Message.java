@@ -26,5 +26,7 @@ public class Message {
     String userId;
     String value;
     String time;
+    
+    String name;
    
 }
