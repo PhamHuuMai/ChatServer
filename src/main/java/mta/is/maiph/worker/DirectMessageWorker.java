@@ -34,8 +34,9 @@ public class DirectMessageWorker extends Thread {
     private UserRepository userRepository;
 
     @Autowired
-    public DirectMessageWorker(ConversationRepository conversationRepository) {
+    public DirectMessageWorker(ConversationRepository conversationRepository,UserRepository userRepository) {
         this.conversationRepository = conversationRepository;
+        this.userRepository = this.userRepository;
     }
 
     @Override
