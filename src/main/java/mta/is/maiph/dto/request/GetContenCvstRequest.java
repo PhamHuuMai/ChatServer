@@ -20,6 +20,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class GetContenCvstRequest {
+public class GetContenCvstRequest extends SkipTakeRequest{
     String cvsId;
 }

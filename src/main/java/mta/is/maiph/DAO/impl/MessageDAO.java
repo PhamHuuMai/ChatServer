@@ -1,4 +1,3 @@
-
 package mta.is.maiph.DAO.impl;
 
 import com.mongodb.BasicDBObject;
@@ -15,34 +14,52 @@ import org.bson.types.ObjectId;
  *
  * @author MaiPH
  */
-public class MessageDAO extends AbstractDAO{
+public class MessageDAO extends AbstractDAO {
 
     @Override
     protected DB getDB() {
-         return mongo.getDB("test");
+        return mongo.getDB("test");
     }
 
     @Override
     protected String colectionName() {
         return "";
     }
-    
-    public void add(String cvsId, String userId, String value){
+
+    public void add(String cvsId, String userId, String value) {
         DBObject obj = new BasicDBObject("user_id", userId);
         obj.put("value", value);
         getDB().getCollection(cvsId).insert(obj);
     }
-    
-    public List<Message> getAllContent(String cvsId){
+
+    public List<Message> getAllContent(String cvsId) {
         List<Message> result = new LinkedList<>();
-        DBCursor cur = getDB().getCollection(cvsId).find().sort(new BasicDBObject("_id",1));
+        DBCursor cur = getDB().getCollection(cvsId).find().sort(new BasicDBObject("_id", 1));
         while (cur.hasNext()) {
             DBObject next = cur.next();
-            ObjectId id = (ObjectId)next.get("_id");
-            String userId = (String)next.get("user_id");
-            String value = (String)next.get("value");
+            ObjectId id = (ObjectId) next.get("_id");
+            String userId = (String) next.get("user_id");
+            String value = (String) next.get("value");
             String date = id.getDate().toString();
-            
+
+            result.add(new Message(id.toHexString(), userId, value, date));
+        }
+        return result;
+    }
+
+    public List<Message> getContent(String cvsId, int skip, int take) {
+        List<Message> result = new LinkedList<>();
+        DBCursor cur = getDB().getCollection(cvsId)
+                .find()
+                .sort(new BasicDBObject("_id", 1))
+                .skip(skip)
+                .limit(take);
+        while (cur.hasNext()) {
+            DBObject next = cur.next();
+            ObjectId id = (ObjectId) next.get("_id");
+            String userId = (String) next.get("user_id");
+            String value = (String) next.get("value");
+            String date = id.getDate().toLocaleString();
             result.add(new Message(id.toHexString(), userId, value, date));
         }
         return result;

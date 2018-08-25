@@ -9,6 +9,7 @@ import mta.is.maiph.DAO.impl.UnreadMsgDAO;
 import mta.is.maiph.constant.ErrorCode;
 import mta.is.maiph.dto.request.AddConversationRequest;
 import mta.is.maiph.dto.request.GetContenCvstRequest;
+import mta.is.maiph.dto.request.SkipTakeRequest;
 import mta.is.maiph.dto.response.ConversationResponse;
 import mta.is.maiph.dto.response.Response;
 import mta.is.maiph.entity.Conversation;
@@ -98,11 +99,23 @@ public class ConversationController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
     @PostMapping("/getconversationcontent")
-    public ResponseEntity getConversationContent(@RequestBody GetContenCvstRequest request,@RequestHeader(name = "Authorization") String token) throws Exception {
+    public ResponseEntity getConversationAllContent(@RequestBody GetContenCvstRequest request,@RequestHeader(name = "Authorization") String token) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.check(token);
         String cvsId = request.getCvsId();
         List<Message> result = msgDAO.getAllContent(cvsId);
+        unReadMsgDAO.read(userId, cvsId);
+        response.setData(result);
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+    @PostMapping("/getconversationcontent/v2")
+    public ResponseEntity getConversationContent(@RequestBody GetContenCvstRequest request,@RequestHeader(name = "Authorization") String token) throws Exception {
+        Response response = new Response(ErrorCode.SUCCESS);
+        String userId = SessionManager.check(token);
+        int skip = request.getSkip();
+        int take = request.getTake();
+        String cvsId = request.getCvsId();
+        List<Message> result = msgDAO.getContent(cvsId,skip,take);
         unReadMsgDAO.read(userId, cvsId);
         response.setData(result);
         return new ResponseEntity(response, HttpStatus.OK);

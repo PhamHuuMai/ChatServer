@@ -1,5 +1,6 @@
 package mta.is.maiph.dto.request;
 
+import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,9 +12,10 @@ import lombok.ToString;
 @Setter
 @Getter
 @ToString
-public class LoginRequest {
+public class SkipTakeRequest {
 
-    String email;
-    String passwordMd5;
-
+    @NotNull
+    Integer skip;
+    @NotNull
+    Integer take;
 }
