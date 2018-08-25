@@ -51,7 +51,7 @@ public class MessageDAO extends AbstractDAO {
         List<Message> result = new LinkedList<>();
         DBCursor cur = getDB().getCollection(cvsId)
                 .find()
-                .sort(new BasicDBObject("_id", 1))
+                .sort(new BasicDBObject("_id", -1))
                 .skip(skip)
                 .limit(take);
         while (cur.hasNext()) {
