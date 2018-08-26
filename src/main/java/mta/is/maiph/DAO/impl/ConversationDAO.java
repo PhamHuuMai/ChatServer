@@ -25,17 +25,23 @@ public class ConversationDAO extends AbstractDAO {
     protected String colectionName() {
         return "conversation";
     }
-    public List<String> getListMem(String id){
-        DBObject result = getColection().findOne(new BasicDBObject("_id",new ObjectId(id)));
-        BasicDBList list = (BasicDBList)result.get("members");
+
+    public List<String> getListMem(String id) {
+        DBObject result = getColection().findOne(new BasicDBObject("_id", new ObjectId(id)));
+        BasicDBList list = (BasicDBList) result.get("members");
         List<String> ret = new LinkedList<>();
         list.forEach(new Consumer<Object>() {
             @Override
             public void accept(Object t) {
-                ret.add((String)t);
+                ret.add((String) t);
             }
         });
         return ret;
     }
-    
+
+    public void updateLastMsg(String cvsId, String msgValue) {
+        DBObject updateObj = new BasicDBObject("last_chat_value", msgValue);
+        getColection().update(new BasicDBObject("_id", new ObjectId(cvsId)),
+                new BasicDBObject("$set", updateObj));
+    }
 }

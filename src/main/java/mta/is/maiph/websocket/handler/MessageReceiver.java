@@ -12,7 +12,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
@@ -23,7 +22,10 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 public class MessageReceiver extends TextWebSocketHandler {
 
     static int i = 1;
-
+    private static MessageDAO msgDAO = new MessageDAO();
+    private static UnreadMsgDAO unreadMsgDAO = new UnreadMsgDAO();
+    private static ConversationDAO cvsDAO = new ConversationDAO();
+            
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         super.afterConnectionClosed(session, status);
@@ -60,11 +62,14 @@ public class MessageReceiver extends TextWebSocketHandler {
                 String value = (String) msgJson.get("value");
                 Message msgDTO = new Message(userId, toConversation, msgType.intValue(), value);
                 ReccieveMessageEntryPoint.add(msgDTO);
-                (new MessageDAO()).add(toConversation, userId, value);
-                List<String> mems = (new ConversationDAO()).getListMem(toConversation);
+                msgDAO.add(toConversation, userId, value);
+                //
+                cvsDAO.updateLastMsg(toConversation, value);
+                //
+                List<String> mems = cvsDAO.getListMem(toConversation);
                 mems.remove(userId);
                 for (String mem : mems) {
-                    (new UnreadMsgDAO()).incUnread(mem, toConversation);
+                    unreadMsgDAO.incUnread(mem, toConversation);
                 }
             } else if (msgType == 2) {
                 String userId = WebsocketSessionManager.getUserId(session.getId());
