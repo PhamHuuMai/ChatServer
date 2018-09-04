@@ -18,13 +18,13 @@ public class SessionManager {
 
     private final Map<String, String> pool = new HashMap<>();
 
-    private static SessionManager instance;
+    private static final SessionManager instance = new SessionManager();
 
     private SessionManager() {
     }
 
     public static SessionManager instance() {
-        return instance == null ? new SessionManager() : instance;
+        return instance;
     }
 
     public void add(String token, String userId) {
