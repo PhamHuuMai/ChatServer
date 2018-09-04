@@ -11,6 +11,15 @@ public class SendMessageEntryPoint {
 
     private static ConcurrentLinkedQueue<Message> pool = new ConcurrentLinkedQueue<>();
 
+    private static SendMessageEntryPoint instance;
+
+    private SendMessageEntryPoint() {
+    }
+
+    public static SendMessageEntryPoint instance() {
+        return instance == null ? new SendMessageEntryPoint() : instance;
+    }
+
     public static void add(Message msg) {
         pool.add(msg);
     }

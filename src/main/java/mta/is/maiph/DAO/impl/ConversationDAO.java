@@ -16,6 +16,15 @@ import org.bson.types.ObjectId;
  */
 public class ConversationDAO extends AbstractDAO {
 
+    private static ConversationDAO instance;
+
+    private ConversationDAO() {
+    }
+
+    public static ConversationDAO instance() {
+        return instance == null ? new ConversationDAO() : instance;
+    }
+
     @Override
     protected DB getDB() {
         return mongo.getDB("test");

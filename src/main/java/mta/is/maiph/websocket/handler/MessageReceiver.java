@@ -24,7 +24,7 @@ public class MessageReceiver extends TextWebSocketHandler {
     static int i = 1;
     private static MessageDAO msgDAO = new MessageDAO();
     private static UnreadMsgDAO unreadMsgDAO = new UnreadMsgDAO();
-    private static ConversationDAO cvsDAO = new ConversationDAO();
+    private static ConversationDAO cvsDAO = ConversationDAO.instance();
             
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
@@ -54,14 +54,14 @@ public class MessageReceiver extends TextWebSocketHandler {
             Long msgType = (Long) msgJson.get("msg_type");
             if (msgType == 0) {
                 String token = (String) msgJson.get("token");
-                String userId = SessionManager.check(token);
+                String userId = SessionManager.instance().check(token);
                 WebsocketSessionManager.add(userId, session);
             } else if (msgType == 1) {
                 String userId = WebsocketSessionManager.getUserId(session.getId());
                 String toConversation = (String) msgJson.get("to");
                 String value = (String) msgJson.get("value");
                 Message msgDTO = new Message(userId, toConversation, msgType.intValue(), value);
-                ReccieveMessageEntryPoint.add(msgDTO);
+                ReccieveMessageEntryPoint.instance().add(msgDTO);
                 msgDAO.add(toConversation, userId, value);
                 //
                 cvsDAO.updateLastMsg(toConversation, value);
@@ -75,7 +75,7 @@ public class MessageReceiver extends TextWebSocketHandler {
                 String userId = WebsocketSessionManager.getUserId(session.getId());
                 String toConversation = (String) msgJson.get("to");
                 Message msgDTO = new Message(userId, toConversation, msgType.intValue(), "");
-                ReccieveMessageEntryPoint.add(msgDTO);
+                ReccieveMessageEntryPoint.instance().add(msgDTO);
             }
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -8,8 +8,8 @@ import mta.is.maiph.DAO.impl.MessageDAO;
 import mta.is.maiph.DAO.impl.UnreadMsgDAO;
 import mta.is.maiph.constant.ErrorCode;
 import mta.is.maiph.dto.request.AddConversationRequest;
+import mta.is.maiph.dto.request.AddMemberRequest;
 import mta.is.maiph.dto.request.GetContenCvstRequest;
-import mta.is.maiph.dto.request.SkipTakeRequest;
 import mta.is.maiph.dto.response.ConversationResponse;
 import mta.is.maiph.dto.response.Response;
 import mta.is.maiph.entity.Conversation;
@@ -35,9 +35,9 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController()
 public class ConversationController {
-    
+
     private ConversationRepository conversationRepository;
-    private UnreadRepository unreadRepository;    
+    private UnreadRepository unreadRepository;
     private UserRepository userRepository;
     private ContactTrackingDAO ct = new ContactTrackingDAO();
     private MessageDAO msgDAO = new MessageDAO();
@@ -49,11 +49,11 @@ public class ConversationController {
         this.unreadRepository = unreadRepository;
         this.userRepository = userRepository;
     }
-    
+
     @PostMapping("/addconversation")
     public ResponseEntity addConversation(@RequestBody AddConversationRequest addConversationRequest, @RequestHeader(name = "Authorization") String token) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
-        String userId = SessionManager.check(token);
+        String userId = SessionManager.instance().check(token);
         String memeberId = addConversationRequest.getMemberId();
         // 
         if (userId.equals(memeberId) || ct.contacted(userId, memeberId)) {
@@ -80,11 +80,51 @@ public class ConversationController {
         //
         return new ResponseEntity(response, HttpStatus.OK);
     }
-    
+
+    @PostMapping("/addmember")
+    public ResponseEntity addMember(@RequestBody AddMemberRequest addMemberRequest, @RequestHeader(name = "Authorization") String token) throws Exception {
+        Response response = new Response(ErrorCode.SUCCESS);
+        String userId = SessionManager.instance().check(token);
+
+        String memeberId = addMemberRequest.getMemberId();
+        String cvsId = addMemberRequest.getCvsId();
+
+        // Check cvs group
+        Conversation cvs = conversationRepository.findById(cvsId).get();
+        if (cvs == null) {
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
+        List<String> members = cvs.getMembers();
+        if (members.contains(memeberId)) {
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
+        members.add(memeberId);
+        if (!cvs.isGroup()) {
+            // create new group and add member
+            cvs.setId(null);
+            cvs.setLastChat("");
+            cvs.setCreateTime(Util.currentTIme_yyyyMMddhhmmss());
+            cvs.setMembers(members);
+            cvs.setName("new conversation");
+            cvs.setGroup(true);
+            Conversation result = conversationRepository.insert(cvs);
+            for (String member : members) {
+                unreadRepository.insert(new UnreadMessage(null, member, result.getId(), "new conversation", 0));
+            }
+        } else {
+            // add member
+            cvs.setMembers(members);
+            conversationRepository.save(cvs);
+            //
+            unreadRepository.insert(new UnreadMessage(null, memeberId, cvsId, cvs.getName(), 0));
+        }
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
     @PostMapping("/getallconversation")
     public ResponseEntity getAllConversation(@RequestHeader(name = "Authorization") String token) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
-        String userId = SessionManager.check(token);
+        String userId = SessionManager.instance().check(token);
         List<UnreadMessage> allConversation = (List<UnreadMessage>) unreadRepository.findByUserId(userId);
         List<ConversationResponse> result = new LinkedList<>();
         for (UnreadMessage um : allConversation) {
@@ -103,7 +143,7 @@ public class ConversationController {
     @PostMapping("/getconversationcontent")
     public ResponseEntity getConversationAllContent(@RequestBody GetContenCvstRequest request, @RequestHeader(name = "Authorization") String token) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
-        String userId = SessionManager.check(token);
+        String userId = SessionManager.instance().check(token);
         String cvsId = request.getCvsId();
         List<Message> result = msgDAO.getAllContent(cvsId);
         unReadMsgDAO.read(userId, cvsId);
@@ -114,7 +154,7 @@ public class ConversationController {
     @PostMapping("/getconversationcontent/v2")
     public ResponseEntity getConversationContent(@RequestBody GetContenCvstRequest request, @RequestHeader(name = "Authorization") String token) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
-        String userId = SessionManager.check(token);
+        String userId = SessionManager.instance().check(token);
         int skip = request.getSkip();
         int take = request.getTake();
         String cvsId = request.getCvsId();
@@ -128,5 +168,5 @@ public class ConversationController {
         response.setData(result);
         return new ResponseEntity(response, HttpStatus.OK);
     }
-    
+
 }

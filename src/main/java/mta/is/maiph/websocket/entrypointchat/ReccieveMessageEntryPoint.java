@@ -14,16 +14,26 @@ import mta.is.maiph.dto.connection.Message;
  */
 public class ReccieveMessageEntryPoint {
 
-    private static ConcurrentLinkedQueue<Message> pool = new ConcurrentLinkedQueue<>();
+    private ConcurrentLinkedQueue<Message> pool = new ConcurrentLinkedQueue<>();
 
-    public static void add(Message msg) {
+    private static ReccieveMessageEntryPoint instance;
+
+    private ReccieveMessageEntryPoint() {
+    }
+
+    public static ReccieveMessageEntryPoint instance() {
+        return instance == null ? new ReccieveMessageEntryPoint() : instance;
+    }
+
+    public void add(Message msg) {
         pool.add(msg);
     }
 
-    public static Message pool() {
+    public Message pool() {
         return pool.poll();
     }
-    public static boolean isEmpty() {
+
+    public boolean isEmpty() {
         return pool.isEmpty();
     }
 }

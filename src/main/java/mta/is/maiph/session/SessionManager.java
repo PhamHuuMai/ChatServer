@@ -16,13 +16,22 @@ import mta.is.maiph.exception.ApplicationException;
  */
 public class SessionManager {
 
-    private static final Map<String, String> pool = new HashMap<>();
+    private final Map<String, String> pool = new HashMap<>();
 
-    public static void add(String token, String userId) {
+    private static SessionManager instance;
+
+    private SessionManager() {
+    }
+
+    public static SessionManager instance() {
+        return instance == null ? new SessionManager() : instance;
+    }
+
+    public void add(String token, String userId) {
         pool.put(token, userId);
     }
 
-    public static String check(String token) throws ApplicationException {
+    public String check(String token) throws ApplicationException {
         if (pool.containsKey(token)) {
             return pool.get(token);
         }

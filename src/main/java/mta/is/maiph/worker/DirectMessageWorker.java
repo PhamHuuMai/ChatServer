@@ -2,26 +2,14 @@ package mta.is.maiph.worker;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import mta.is.maiph.DAO.impl.ConversationDAO;
 import mta.is.maiph.DAO.impl.UserDAO;
 import mta.is.maiph.dto.connection.Message;
-import mta.is.maiph.entity.Conversation;
-import mta.is.maiph.entity.User;
-import mta.is.maiph.repository.ConversationRepository;
-import mta.is.maiph.repository.UserRepository;
 import mta.is.maiph.websocket.entrypointchat.ReccieveMessageEntryPoint;
 import mta.is.maiph.websocket.session.WebsocketSessionManager;
-import org.bson.types.ObjectId;
 import org.json.simple.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 /**
@@ -37,18 +25,17 @@ public class DirectMessageWorker extends Thread {
     public void run() {
         while (true) {
             try {
-                if (ReccieveMessageEntryPoint.isEmpty()) {
+                if (ReccieveMessageEntryPoint.instance().isEmpty()) {
                     continue;
                 }
                 // get msg in send pool
-                Message msg = ReccieveMessageEntryPoint.pool();
+                Message msg = ReccieveMessageEntryPoint.instance().pool();
                 // get to conversation
                 String cvsId = msg.getToConversationId();
                 String fromId = msg.getFromId();
                 String fromUsername = userDAO.getUserNameById(fromId);
-                System.out.println(cvsId);
                 // get all member in conversation
-                ConversationDAO cvtDAO = new ConversationDAO();
+                ConversationDAO cvtDAO = ConversationDAO.instance();
                 // send to all member in conversation
                 List<String> mem = cvtDAO.getListMem(cvsId);
                 JSONObject json = new JSONObject();

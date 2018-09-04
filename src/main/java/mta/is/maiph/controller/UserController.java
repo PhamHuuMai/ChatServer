@@ -50,7 +50,7 @@ public class UserController {
             throw new ApplicationException(ErrorCode.INVALID_ACCOUNT);
         }
         String token = TokenFactory.generateRandomToken();
-        SessionManager.add(token, user.getId());
+        SessionManager.instance().add(token, user.getId());
         response.setData(new LoginResponse(token, user.getEmail(),user.getId()));
         return new ResponseEntity(response, HttpStatus.OK);
     }
@@ -68,15 +68,40 @@ public class UserController {
         User result = userRepository.insert(user);
 
         String token = TokenFactory.generateRandomToken();
-        SessionManager.add(token, result.getId());
+        SessionManager.instance().add(token, result.getId());
         response.setData(new LoginResponse(token, user.getEmail(),result.getId()));
         return new ResponseEntity(response, HttpStatus.OK);
     }
     
     @PostMapping("/getAllUser")
-    public ResponseEntity register(@RequestHeader(name = "Authorization") String token) throws Exception {
+    public ResponseEntity getAllUser(@RequestHeader(name = "Authorization") String token) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
-        String userId = SessionManager.check(token);
+        String userId = SessionManager.instance().check(token);
+        List<User> users = userRepository.findAll();
+        List<UserResponse> userResponse = new LinkedList<>();
+        for (User user : users) {
+            userResponse.add(new UserResponse(user));
+        }
+        response.setData(userResponse);
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+    
+    @PostMapping("/addfriend")
+    public ResponseEntity addFriend(@RequestHeader(name = "Authorization") String token) throws Exception {
+        Response response = new Response(ErrorCode.SUCCESS);
+        String userId = SessionManager.instance().check(token);
+        List<User> users = userRepository.findAll();
+        List<UserResponse> userResponse = new LinkedList<>();
+        for (User user : users) {
+            userResponse.add(new UserResponse(user));
+        }
+        response.setData(userResponse);
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+    @PostMapping("/allfriend")
+    public ResponseEntity getFriend(@RequestHeader(name = "Authorization") String token) throws Exception {
+        Response response = new Response(ErrorCode.SUCCESS);
+        String userId = SessionManager.instance().check(token);
         List<User> users = userRepository.findAll();
         List<UserResponse> userResponse = new LinkedList<>();
         for (User user : users) {
