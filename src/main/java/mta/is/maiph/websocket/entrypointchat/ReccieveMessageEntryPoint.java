@@ -16,13 +16,13 @@ public class ReccieveMessageEntryPoint {
 
     private ConcurrentLinkedQueue<Message> pool = new ConcurrentLinkedQueue<>();
 
-    private static ReccieveMessageEntryPoint instance;
+    private static ReccieveMessageEntryPoint instance = new ReccieveMessageEntryPoint();
 
     private ReccieveMessageEntryPoint() {
     }
 
     public static ReccieveMessageEntryPoint instance() {
-        return instance == null ? new ReccieveMessageEntryPoint() : instance;
+        return instance;
     }
 
     public void add(Message msg) {
