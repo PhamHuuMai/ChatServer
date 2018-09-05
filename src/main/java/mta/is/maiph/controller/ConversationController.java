@@ -10,8 +10,10 @@ import mta.is.maiph.constant.ErrorCode;
 import mta.is.maiph.dto.request.AddConversationRequest;
 import mta.is.maiph.dto.request.AddMemberRequest;
 import mta.is.maiph.dto.request.GetContenCvstRequest;
+import mta.is.maiph.dto.request.ListMemberRequest;
 import mta.is.maiph.dto.response.ConversationResponse;
 import mta.is.maiph.dto.response.Response;
+import mta.is.maiph.dto.response.UserResponse;
 import mta.is.maiph.entity.Conversation;
 import mta.is.maiph.entity.Message;
 import mta.is.maiph.entity.UnreadMessage;
@@ -121,6 +123,27 @@ public class ConversationController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
+    @PostMapping("/allmember")
+    public ResponseEntity allMember(@RequestBody ListMemberRequest request, @RequestHeader(name = "Authorization") String token) throws Exception {
+        Response response = new Response(ErrorCode.SUCCESS);
+        String userId = SessionManager.instance().check(token);
+
+        String cvsId = request.getCvsId();
+
+        // Check cvs group
+        Conversation cvs = conversationRepository.findById(cvsId).get();
+        if (cvs == null) {
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
+        List<String> members = cvs.getMembers();
+        Iterable<User> result = userRepository.findAllById(members);
+        List<UserResponse> resp = new LinkedList<>();
+        for (User user : result) {
+            resp.add(new UserResponse(user));
+        }
+        response.setData(resp);
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
     @PostMapping("/getallconversation")
     public ResponseEntity getAllConversation(@RequestHeader(name = "Authorization") String token) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);

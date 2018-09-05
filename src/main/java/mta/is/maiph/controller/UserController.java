@@ -8,6 +8,7 @@ package mta.is.maiph.controller;
 import java.util.LinkedList;
 import java.util.List;
 import mta.is.maiph.constant.ErrorCode;
+import mta.is.maiph.dto.request.AddMemberRequest;
 import mta.is.maiph.entity.User;
 import mta.is.maiph.exception.ApplicationException;
 import mta.is.maiph.repository.UserRepository;
@@ -87,15 +88,14 @@ public class UserController {
     }
     
     @PostMapping("/addfriend")
-    public ResponseEntity addFriend(@RequestHeader(name = "Authorization") String token) throws Exception {
+    public ResponseEntity addFriend(@RequestHeader(name = "Authorization") String token,@RequestBody AddMemberRequest request) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.instance().check(token);
-        List<User> users = userRepository.findAll();
-        List<UserResponse> userResponse = new LinkedList<>();
-        for (User user : users) {
-            userResponse.add(new UserResponse(user));
-        }
-        response.setData(userResponse);
+        String cvsId = request.getCvsId();
+        String memberId = request.getMemberId();
+        // 
+        
+        
         return new ResponseEntity(response, HttpStatus.OK);
     }
     @PostMapping("/allfriend")
