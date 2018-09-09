@@ -16,8 +16,9 @@ public abstract class AbstractDAO {
 
     static {
         if (mongo == null) {
-            MongoClientURI uri = new MongoClientURI("mongodb://phamhuumai:21B%401996@cluster0-shard-00-00-jywz0.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true");
-            mongo = new MongoClient(uri);
+//            MongoClientURI uri = new MongoClientURI("mongodb://phamhuumai:21B%401996@cluster0-shard-00-00-jywz0.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true");
+            System.out.println(MongoConfig.HOST);
+             mongo = new MongoClient(MongoConfig.HOST);
         }
     }
 

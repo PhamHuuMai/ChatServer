@@ -12,7 +12,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MongoConfig {
     
-    @Value("${spring.data.mongodb.uri}")
-    public static String URI ; 
+//    @Value("${spring.data.mongodb.uri}")
+//    public static String URI; 
+    
+    @Value("${spring.data.mongodb.host}")
+    public static String HOST; 
 
+    @Value("${spring.data.mongodb.port}")
+    public static int PORT; 
 }
