@@ -34,4 +34,10 @@ public class UnreadMsgDAO extends AbstractDAO{
         BasicDBObject inc = new BasicDBObject("num_unread", 0);
         getColection().update(query, new BasicDBObject("$set",inc));
     }
+    
+    public void rename(String cvsId,String name) {
+        DBObject query = new BasicDBObject("conversation_id", cvsId);
+        BasicDBObject update = new BasicDBObject("conversation_name", name);
+        getColection().update(query, new BasicDBObject("$set",update));
+    }
 }

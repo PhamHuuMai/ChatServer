@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import mta.is.maiph.DAO.impl.ContactTrackingDAO;
+import mta.is.maiph.DAO.impl.ConversationDAO;
 import mta.is.maiph.DAO.impl.MessageDAO;
 import mta.is.maiph.DAO.impl.UnreadMsgDAO;
 import mta.is.maiph.constant.ErrorCode;
@@ -11,6 +12,7 @@ import mta.is.maiph.dto.request.AddConversationRequest;
 import mta.is.maiph.dto.request.AddMemberRequest;
 import mta.is.maiph.dto.request.GetContenCvstRequest;
 import mta.is.maiph.dto.request.ListMemberRequest;
+import mta.is.maiph.dto.request.RenameConversationRequest;
 import mta.is.maiph.dto.response.ConversationResponse;
 import mta.is.maiph.dto.response.Response;
 import mta.is.maiph.dto.response.UserResponse;
@@ -44,7 +46,7 @@ public class ConversationController {
     private ContactTrackingDAO ct = new ContactTrackingDAO();
     private MessageDAO msgDAO = new MessageDAO();
     private UnreadMsgDAO unReadMsgDAO = new UnreadMsgDAO();
-
+    private ConversationDAO cvsDAO = ConversationDAO.instance();
     @Autowired
     public ConversationController(ConversationRepository conversationRepository, UnreadRepository unreadRepository, UserRepository userRepository) {
         this.conversationRepository = conversationRepository;
@@ -189,6 +191,17 @@ public class ConversationController {
         });
         unReadMsgDAO.read(userId, cvsId);
         response.setData(result);
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/renameconversation")
+    public ResponseEntity renameConversation(@RequestBody RenameConversationRequest request, @RequestHeader(name = "Authorization") String token) throws Exception {
+        Response response = new Response(ErrorCode.SUCCESS);
+        String userId = SessionManager.instance().check(token);
+        String cvsId = request.getCvsId();
+        String name = request.getName();
+        cvsDAO.updateName(cvsId, name);
+        unReadMsgDAO.rename(cvsId, name);
         return new ResponseEntity(response, HttpStatus.OK);
     }
 

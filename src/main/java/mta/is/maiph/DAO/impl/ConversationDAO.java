@@ -23,7 +23,8 @@ public class ConversationDAO extends AbstractDAO {
     }
 
     public static ConversationDAO instance() {
-        return instance == null ? new ConversationDAO() : instance;
+        instance = instance == null ? new ConversationDAO() : instance;
+        return instance;
     }
 
     @Override
@@ -53,5 +54,12 @@ public class ConversationDAO extends AbstractDAO {
         DBObject updateObj = new BasicDBObject("last_chat_value", msgValue);
         getColection().update(new BasicDBObject("_id", new ObjectId(cvsId)),
                 new BasicDBObject("$set", updateObj));
+    }
+
+    public void updateName(String cvsId, String name) {
+        DBObject findObj = new BasicDBObject("_id", new ObjectId(cvsId));
+        findObj.put("is_group", true);
+        DBObject updateObj = new BasicDBObject("name", name);
+        getColection().update(findObj,new BasicDBObject("$set", updateObj));
     }
 }
