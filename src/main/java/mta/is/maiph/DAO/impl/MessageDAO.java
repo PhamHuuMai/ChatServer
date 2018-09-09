@@ -7,6 +7,7 @@ import com.mongodb.DBObject;
 import java.util.LinkedList;
 import java.util.List;
 import mta.is.maiph.DAO.AbstractDAO;
+import mta.is.maiph.config.MongoConfig;
 import mta.is.maiph.entity.Message;
 import org.bson.types.ObjectId;
 
@@ -18,7 +19,7 @@ public class MessageDAO extends AbstractDAO {
 
     @Override
     protected DB getDB() {
-        return mongo.getDB("test");
+        return mongo.getDB(MongoConfig.DB);
     }
 
     @Override

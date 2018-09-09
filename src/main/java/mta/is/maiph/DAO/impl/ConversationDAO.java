@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 import mta.is.maiph.DAO.AbstractDAO;
+import mta.is.maiph.config.MongoConfig;
 import org.bson.types.ObjectId;
 
 /**
@@ -27,7 +28,7 @@ public class ConversationDAO extends AbstractDAO {
 
     @Override
     protected DB getDB() {
-        return mongo.getDB("test");
+        return mongo.getDB(MongoConfig.DB);
     }
 
     @Override

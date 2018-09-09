@@ -20,4 +20,6 @@ public class MongoConfig {
 
     @Value("${spring.data.mongodb.port}")
     public static int PORT; 
+    @Value("${spring.data.mongodb.database}")
+    public static String DB;
 }

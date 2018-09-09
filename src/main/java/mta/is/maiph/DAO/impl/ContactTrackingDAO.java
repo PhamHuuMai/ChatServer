@@ -5,6 +5,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import mta.is.maiph.DAO.AbstractDAO;
+import mta.is.maiph.config.MongoConfig;
 
 /**
  *
@@ -16,7 +17,7 @@ public class ContactTrackingDAO extends AbstractDAO {
 
     @Override
     protected DB getDB() {
-        return mongo.getDB("test");
+        return mongo.getDB(MongoConfig.DB);
     }
 
     @Override

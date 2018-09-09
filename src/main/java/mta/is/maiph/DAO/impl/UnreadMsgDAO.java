@@ -4,6 +4,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBObject;
 import mta.is.maiph.DAO.AbstractDAO;
+import mta.is.maiph.config.MongoConfig;
 
 /**
  *
@@ -13,7 +14,7 @@ public class UnreadMsgDAO extends AbstractDAO{
 
     @Override
     protected DB getDB() {
-        return mongo.getDB("test");
+        return mongo.getDB(MongoConfig.DB);
     }
 
     @Override
