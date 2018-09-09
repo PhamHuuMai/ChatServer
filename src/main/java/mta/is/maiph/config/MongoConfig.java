@@ -15,11 +15,11 @@ public class MongoConfig {
 //    @Value("${spring.data.mongodb.uri}")
 //    public static String URI; 
     
-    @Value("${spring.data.mongodb.host}")
-    public static String HOST; 
+//    @Value("${spring.data.mongodb.host}")
+    public static String HOST = "103.81.85.169"; 
 
-    @Value("${spring.data.mongodb.port}")
-    public static int PORT; 
-    @Value("${spring.data.mongodb.database}")
-    public static String DB;
+//    @Value("${spring.data.mongodb.port}")
+    public static int PORT = 27017; 
+//    @Value("${spring.data.mongodb.database}")
+    public static String DB = "chat-db";
 }
