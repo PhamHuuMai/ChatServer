@@ -7,8 +7,10 @@ package mta.is.maiph.controller;
 
 import java.util.LinkedList;
 import java.util.List;
+import mta.is.maiph.DAO.impl.ConversationDAO;
 import mta.is.maiph.constant.ErrorCode;
 import mta.is.maiph.dto.request.AddMemberRequest;
+import mta.is.maiph.dto.request.AllFriendRequest;
 import mta.is.maiph.entity.User;
 import mta.is.maiph.exception.ApplicationException;
 import mta.is.maiph.repository.UserRepository;
@@ -46,13 +48,13 @@ public class UserController {
     public ResponseEntity login(@RequestBody LoginRequest loginRequest) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
         List<User> users = userRepository.findAll();
-        User user = userRepository.findByEmailAndPassword(loginRequest.getEmail(),loginRequest.getPasswordMd5());
+        User user = userRepository.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPasswordMd5());
         if (user == null) {
             throw new ApplicationException(ErrorCode.INVALID_ACCOUNT);
         }
         String token = TokenFactory.generateRandomToken();
         SessionManager.instance().add(token, user.getId());
-        response.setData(new LoginResponse(token, user.getEmail(),user.getId()));
+        response.setData(new LoginResponse(token, user.getEmail(), user.getId()));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
@@ -65,15 +67,15 @@ public class UserController {
         }
         String originalPass = regRequest.getPassword();
         String password = Util.MD5(originalPass);
-        user = new User(null, regRequest.getName(), regRequest.getEmail(), originalPass, password,Util.currentTIme_yyyyMMddhhmmss());
+        user = new User(null, regRequest.getName(), regRequest.getEmail(), originalPass, password, Util.currentTIme_yyyyMMddhhmmss());
         User result = userRepository.insert(user);
 
         String token = TokenFactory.generateRandomToken();
         SessionManager.instance().add(token, result.getId());
-        response.setData(new LoginResponse(token, user.getEmail(),result.getId()));
+        response.setData(new LoginResponse(token, user.getEmail(), result.getId()));
         return new ResponseEntity(response, HttpStatus.OK);
     }
-    
+
     @PostMapping("/getAllUser")
     public ResponseEntity getAllUser(@RequestHeader(name = "Authorization") String token) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
@@ -86,26 +88,31 @@ public class UserController {
         response.setData(userResponse);
         return new ResponseEntity(response, HttpStatus.OK);
     }
-    
+
     @PostMapping("/addfriend")
-    public ResponseEntity addFriend(@RequestHeader(name = "Authorization") String token,@RequestBody AddMemberRequest request) throws Exception {
+    public ResponseEntity addFriend(@RequestHeader(name = "Authorization") String token, @RequestBody AddMemberRequest request) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.instance().check(token);
         String cvsId = request.getCvsId();
         String memberId = request.getMemberId();
         // 
-        
-        
+
         return new ResponseEntity(response, HttpStatus.OK);
     }
+
     @PostMapping("/allfriend")
-    public ResponseEntity getFriend(@RequestHeader(name = "Authorization") String token) throws Exception {
+    public ResponseEntity getFriend(@RequestHeader(name = "Authorization") String token, @RequestBody AllFriendRequest request) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.instance().check(token);
+        String csvId = request.getCvsId();
+        List<String> members = ConversationDAO.instance().getListMem(csvId);
         List<User> users = userRepository.findAll();
         List<UserResponse> userResponse = new LinkedList<>();
+
         for (User user : users) {
-            userResponse.add(new UserResponse(user));
+            if (!members.contains(user.getId())) {
+                userResponse.add(new UserResponse(user));
+            }
         }
         response.setData(userResponse);
         return new ResponseEntity(response, HttpStatus.OK);
