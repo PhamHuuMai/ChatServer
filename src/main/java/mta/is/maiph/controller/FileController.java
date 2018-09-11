@@ -6,6 +6,7 @@
 package mta.is.maiph.controller;
 
 import java.util.Base64;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import javax.sound.midi.SysexMessage;
@@ -44,10 +45,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController()
 public class FileController {
 
-
     @Autowired
     public FileController() {
-        
+
     }
 
     @PostMapping("/uploadfile")
@@ -60,7 +60,14 @@ public class FileController {
         Base64Util.createDir(filePath);
         String fileNameLocal = System.currentTimeMillis() + fileName;
         Base64Util.decode(fileBase64, filePath + fileNameLocal);
-        response.setData(new UploadFileResponse(Base64Util.generatePath() + fileNameLocal,""));
+        new FileDAO().insert(
+                new File(
+                        null,
+                        userId,
+                        fileName, request.getMimeType(),
+                        Base64Util.generatePath() + fileNameLocal,
+                        new Date().toGMTString()));
+        response.setData(new UploadFileResponse(Base64Util.generatePath() + fileNameLocal, ""));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 

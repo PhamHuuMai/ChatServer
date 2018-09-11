@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 /**
  *
  * @author MaiPH
@@ -25,10 +26,12 @@ import java.nio.file.Paths;
 public class Base64Util {
 
     public static String generatePath(){
-        int year = Calendar.YEAR;
-        int month = Calendar.MONTH;
-        int date = Calendar.DAY_OF_MONTH;
+        Date dateP = new Date(System.currentTimeMillis());
+        int year = dateP.getYear()+1900;
+        int month = dateP.getMonth()+1;
+        int date = dateP.getDate();
         StringBuilder path = new StringBuilder();
+        path.append(File.separatorChar);
         path.append(year);
         path.append(File.separatorChar);
         path.append(month);
