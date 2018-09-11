@@ -28,7 +28,7 @@ public class Base64Util {
         int year = Calendar.YEAR;
         int month = Calendar.MONTH;
         int date = Calendar.DAY_OF_MONTH;
-        StringBuilder path = new StringBuilder(File.separatorChar);
+        StringBuilder path = new StringBuilder();
         path.append(year);
         path.append(File.separatorChar);
         path.append(month);
@@ -39,7 +39,8 @@ public class Base64Util {
     }
     
     public static String generatePathRoot(){
-        StringBuilder path = new StringBuilder(File.separatorChar);
+        StringBuilder path = new StringBuilder();
+        path.append(File.separatorChar);
         path.append("var");
         path.append(File.separatorChar);
         path.append("www");
@@ -47,6 +48,7 @@ public class Base64Util {
         path.append("html");
         path.append(File.separatorChar);
         path.append("file");
+        path.append(File.separatorChar);
         return path.toString();
     }
     public static void createDir(String path){     
