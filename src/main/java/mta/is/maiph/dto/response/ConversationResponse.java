@@ -23,6 +23,7 @@ import lombok.ToString;
 public class ConversationResponse {
     String id;
     String name;
+    String avatar;
     String lastChat;
     int numUnread;
     String lastTimeAction;

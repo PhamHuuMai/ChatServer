@@ -156,9 +156,10 @@ public class ConversationController {
             Conversation cvs = conversationRepository.findById(um.getConversationId()).get();
             result.add(new ConversationResponse(um.getConversationId(),
                     um.getConversationName(),
+                    "http://103.81.85.169/file/1.png",
                     cvs.getLastChat(),
                     um.getNumUnread(),
-                    cvs.getLastTimeAction()
+                    cvs.getLastTimeAction()           
             ));
         }
         response.setData(result);
@@ -188,6 +189,7 @@ public class ConversationController {
             String msgOwner = t.getUserId();
             User u = userRepository.findById(msgOwner).get();
             t.setName(u.getName());
+            t.setAvatar(u.getAvatarUrl());
         });
         unReadMsgDAO.read(userId, cvsId);
         response.setData(result);

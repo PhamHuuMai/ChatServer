@@ -56,7 +56,7 @@ public class UserController {
         }
         String token = TokenFactory.generateRandomToken();
         SessionManager.instance().add(token, user.getId());
-        response.setData(new LoginResponse(token, user.getEmail(), user.getId(),user.getName()));
+        response.setData(new LoginResponse(token, user.getEmail(), user.getId(),user.getName(),user.getAvatarUrl()));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
@@ -77,10 +77,9 @@ public class UserController {
                 "http://103.81.85.169/file/2.png"
         );
         User result = userRepository.insert(user);
-
         String token = TokenFactory.generateRandomToken();
         SessionManager.instance().add(token, result.getId());
-        response.setData(new LoginResponse(token, user.getEmail(), result.getId(),result.getName()));
+        response.setData(new LoginResponse(token, user.getEmail(), result.getId(),result.getName(),result.getAvatarUrl()));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 

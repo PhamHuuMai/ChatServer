@@ -22,4 +22,5 @@ public class LoginResponse {
     String email;
     String userId;
     String name;
+    String avatar;
 }

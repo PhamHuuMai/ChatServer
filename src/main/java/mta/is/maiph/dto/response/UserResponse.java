@@ -20,11 +20,13 @@ import mta.is.maiph.entity.User;
 public class UserResponse {
     String userId;
     String userName;
+    String avatar;
     String lastLoginTIme;
     public UserResponse(User user){
        userId = user.getId();
        userName = user.getName();
        lastLoginTIme = user.getLastLogin();
+       avatar = user.getAvatarUrl();
     }
     
 }

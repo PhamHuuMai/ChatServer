@@ -28,5 +28,6 @@ public class Message {
     String time;
     
     String name;
+    String avatar;
    
 }
