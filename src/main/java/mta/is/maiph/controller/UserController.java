@@ -8,6 +8,7 @@ package mta.is.maiph.controller;
 import java.util.LinkedList;
 import java.util.List;
 import mta.is.maiph.DAO.impl.ConversationDAO;
+import mta.is.maiph.DAO.impl.UserDAO;
 import mta.is.maiph.constant.ErrorCode;
 import mta.is.maiph.dto.request.AddMemberRequest;
 import mta.is.maiph.dto.request.AllFriendRequest;
@@ -16,6 +17,7 @@ import mta.is.maiph.exception.ApplicationException;
 import mta.is.maiph.repository.UserRepository;
 import mta.is.maiph.dto.request.LoginRequest;
 import mta.is.maiph.dto.request.RegisterRequest;
+import mta.is.maiph.dto.request.RenameRequest;
 import mta.is.maiph.dto.response.LoginResponse;
 import mta.is.maiph.dto.response.Response;
 import mta.is.maiph.dto.response.UserResponse;
@@ -38,7 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private UserRepository userRepository;
-
+    private UserDAO userDAO = new UserDAO();
     @Autowired
     public UserController(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -118,4 +120,13 @@ public class UserController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
+    @PostMapping("/rename")
+    public ResponseEntity rename(@RequestHeader(name = "Authorization") String token, @RequestBody RenameRequest request) throws Exception {
+        Response response = new Response(ErrorCode.SUCCESS);
+        String userId = SessionManager.instance().check(token);
+        String name = request.getNewName();
+        userDAO.updateUserName(userId, name);
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+    
 }
