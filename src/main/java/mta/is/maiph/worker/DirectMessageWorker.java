@@ -34,6 +34,7 @@ public class DirectMessageWorker extends Thread {
                 String cvsId = msg.getToConversationId();
                 String fromId = msg.getFromId();
                 String fromUsername = userDAO.getUserNameById(fromId);
+                String avt = userDAO.getAvatarById(fromId);
                 // get all member in conversation
                 ConversationDAO cvtDAO = ConversationDAO.instance();
                 // send to all member in conversation
@@ -44,6 +45,7 @@ public class DirectMessageWorker extends Thread {
                 json.put("to", cvsId);
                 json.put("from", msg.getFromId());
                 json.put("name", fromUsername);
+                json.put("avt", avt);
                 for (String id : mem) {
                     List<WebSocketSession> des = WebsocketSessionManager.get(id);
                     for (WebSocketSession de : des) {
