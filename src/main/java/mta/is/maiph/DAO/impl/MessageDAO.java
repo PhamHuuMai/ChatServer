@@ -30,6 +30,7 @@ public class MessageDAO extends AbstractDAO {
     public void add(String cvsId, String userId, String value,int type) {
         DBObject obj = new BasicDBObject("user_id", userId);
         obj.put("value", value);
+        obj.put("type", type);
         getDB().getCollection(cvsId).insert(obj);
     }
 
