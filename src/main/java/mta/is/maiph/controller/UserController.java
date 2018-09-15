@@ -74,7 +74,7 @@ public class UserController {
                 regRequest.getEmail(),
                 originalPass, password, 
                 Util.currentTIme_yyyyMMddhhmmss(),
-                "http://103.81.85.169/file/2.png"
+                "/2.png"
         );
         User result = userRepository.insert(user);
         String token = TokenFactory.generateRandomToken();

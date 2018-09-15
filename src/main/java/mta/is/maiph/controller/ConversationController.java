@@ -156,7 +156,7 @@ public class ConversationController {
             Conversation cvs = conversationRepository.findById(um.getConversationId()).get();
             result.add(new ConversationResponse(um.getConversationId(),
                     um.getConversationName(),
-                    "http://103.81.85.169/file/1.png",
+                    "/1.png",
                     cvs.getLastChat(),
                     um.getNumUnread(),
                     cvs.getLastTimeAction()           
