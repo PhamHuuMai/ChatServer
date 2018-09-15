@@ -27,7 +27,7 @@ public class MessageDAO extends AbstractDAO {
         return "";
     }
 
-    public void add(String cvsId, String userId, String value) {
+    public void add(String cvsId, String userId, String value,int type) {
         DBObject obj = new BasicDBObject("user_id", userId);
         obj.put("value", value);
         getDB().getCollection(cvsId).insert(obj);

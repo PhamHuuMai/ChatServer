@@ -64,7 +64,7 @@ public class MessageReceiver extends TextWebSocketHandler {
                 String value = (String) msgJson.get("value");
                 Message msgDTO = new Message(userId, toConversation, msgType.intValue(), value);
                 ReccieveMessageEntryPoint.instance().add(msgDTO);
-                msgDAO.add(toConversation, userId, value);
+                msgDAO.add(toConversation, userId, value,msgType.intValue());
                 //
                 cvsDAO.updateLastMsg(toConversation, value);
                 //
@@ -85,7 +85,7 @@ public class MessageReceiver extends TextWebSocketHandler {
                 String fileId = (String) msgJson.get("file_id");
                 Message msgDTO = new Message(userId, toConversation, msgType.intValue(), value);
                 ReccieveMessageEntryPoint.instance().add(msgDTO);
-                msgDAO.add(toConversation, userId, value);
+                msgDAO.add(toConversation, userId, value,msgType.intValue());
                 //
                 cvsDAO.updateLastMsg(toConversation, value);
                 //
