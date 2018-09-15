@@ -32,4 +32,6 @@ public class User {
     String password;
     @Field(value = "last_time_login")
     String lastLogin;
+    @Field(value = "avatar_url")
+    String avatarUrl;
 }

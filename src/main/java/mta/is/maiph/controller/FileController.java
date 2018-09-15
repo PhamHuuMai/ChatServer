@@ -10,8 +10,10 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import javax.sound.midi.SysexMessage;
+import lombok.extern.slf4j.Slf4j;
 import mta.is.maiph.DAO.impl.ConversationDAO;
 import mta.is.maiph.DAO.impl.FileDAO;
+import mta.is.maiph.DAO.impl.UserDAO;
 import mta.is.maiph.constant.ErrorCode;
 import mta.is.maiph.dto.request.AddMemberRequest;
 import mta.is.maiph.dto.request.AllFriendRequest;
@@ -43,14 +45,17 @@ import org.springframework.web.bind.annotation.RestController;
  * @author MaiPH
  */
 @RestController()
+@Slf4j
 public class FileController {
-
+    private final FileDAO fileDAO = new FileDAO();
+    private final UserDAO userDAO = new UserDAO();
+    
     @Autowired
     public FileController() {
 
     }
 
-    @PostMapping("/uploadfile")
+    @PostMapping("/uploadavatar")
     public ResponseEntity upload(@RequestHeader(name = "Authorization") String token, @RequestBody UploadFileRequest request) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.instance().check(token);
@@ -60,13 +65,14 @@ public class FileController {
         Base64Util.createDir(filePath);
         String fileNameLocal = System.currentTimeMillis() + fileName;
         Base64Util.decode(fileBase64, filePath + fileNameLocal);
-        new FileDAO().insert(
+        fileDAO.insert(
                 new File(
                         null,
                         userId,
                         fileName, request.getMimeType(),
                         Base64Util.generatePath() + fileNameLocal,
                         new Date().toGMTString()));
+        userDAO.updateAvatar(userId, Base64Util.generatePath() + fileNameLocal);
         response.setData(new UploadFileResponse(Base64Util.generatePath() + fileNameLocal, ""));
         return new ResponseEntity(response, HttpStatus.OK);
     }

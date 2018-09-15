@@ -30,4 +30,8 @@ public class UserDAO extends AbstractDAO {
         DBObject find = new BasicDBObject("_id",new ObjectId(userId));
         getColection().update(find, new BasicDBObject("$set",new BasicDBObject("name",name)));
     }
+    public void updateAvatar(String userId,String avatar){
+        DBObject find = new BasicDBObject("_id",new ObjectId(userId));
+        getColection().update(find, new BasicDBObject("$set",new BasicDBObject("avatar_url",avatar)));
+    }
 }
