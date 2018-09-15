@@ -12,6 +12,7 @@ import java.util.List;
 import javax.sound.midi.SysexMessage;
 import lombok.extern.slf4j.Slf4j;
 import mta.is.maiph.DAO.impl.ConversationDAO;
+import mta.is.maiph.DAO.impl.FileAttachmentDAO;
 import mta.is.maiph.DAO.impl.FileDAO;
 import mta.is.maiph.DAO.impl.UserDAO;
 import mta.is.maiph.constant.ErrorCode;
@@ -22,12 +23,14 @@ import mta.is.maiph.exception.ApplicationException;
 import mta.is.maiph.repository.UserRepository;
 import mta.is.maiph.dto.request.LoginRequest;
 import mta.is.maiph.dto.request.RegisterRequest;
+import mta.is.maiph.dto.request.UploadFileAttachmentRequest;
 import mta.is.maiph.dto.request.UploadFileRequest;
 import mta.is.maiph.dto.response.LoginResponse;
 import mta.is.maiph.dto.response.Response;
 import mta.is.maiph.dto.response.UploadFileResponse;
 import mta.is.maiph.dto.response.UserResponse;
 import mta.is.maiph.entity.File;
+import mta.is.maiph.entity.FileAttachment;
 import mta.is.maiph.session.SessionManager;
 import mta.is.maiph.session.TokenFactory;
 import mta.is.maiph.util.Base64Util;
@@ -49,6 +52,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class FileController {
     private final FileDAO fileDAO = new FileDAO();
     private final UserDAO userDAO = new UserDAO();
+    private final FileAttachmentDAO fileAttachmentDAO = new FileAttachmentDAO();
     
     @Autowired
     public FileController() {
@@ -74,6 +78,29 @@ public class FileController {
                         new Date().toGMTString()));
         userDAO.updateAvatar(userId, Base64Util.generatePath() + fileNameLocal);
         response.setData(new UploadFileResponse(Base64Util.generatePath() + fileNameLocal, ""));
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+    @PostMapping("/uploadfileattachment")
+    public ResponseEntity uploadFileAttachment(@RequestHeader(name = "Authorization") String token, @RequestBody UploadFileAttachmentRequest request) throws Exception {
+        Response response = new Response(ErrorCode.SUCCESS);
+        String userId = SessionManager.instance().check(token);
+        String fileBase64 = request.getFile();
+        String fileName = request.getFileName();
+        String filePath = Base64Util.generatePathRoot() + Base64Util.generatePath();
+        Base64Util.createDir(filePath);
+        String fileNameLocal = System.currentTimeMillis() + fileName;
+        Base64Util.decode(fileBase64, filePath + fileNameLocal);
+        String id = fileAttachmentDAO.insert(
+                new FileAttachment(
+                        null,
+                        userId,
+                        fileName, request.getMimeType(),
+                        Base64Util.generatePath() + fileNameLocal,
+                        new Date().toGMTString(),
+                        request.getCvsId()
+                  ));
+        
+        response.setData(new UploadFileResponse(Base64Util.generatePath() + fileNameLocal, id));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
