@@ -42,9 +42,9 @@ public class MessageDAO extends AbstractDAO {
             ObjectId id = (ObjectId) next.get("_id");
             String userId = (String) next.get("user_id");
             String value = (String) next.get("value");
+            Integer type = (Integer) next.get("type");
             String date = id.getDate().toString();
-
-            result.add(new Message(id.toHexString(), userId, value, date,"",""));
+            result.add(new Message(id.toHexString(), userId, value, date,type,"",""));
         }
         return result;
     }
@@ -61,8 +61,9 @@ public class MessageDAO extends AbstractDAO {
             ObjectId id = (ObjectId) next.get("_id");
             String userId = (String) next.get("user_id");
             String value = (String) next.get("value");
+            Integer type = (Integer) next.get("type");
             String date = id.getDate().toLocaleString();
-            result.add(new Message(id.toHexString(), userId, value, date,"",""));
+            result.add(new Message(id.toHexString(), userId, value, date,type,"",""));
         }
         return result;
     }
