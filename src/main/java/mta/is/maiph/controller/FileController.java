@@ -88,7 +88,7 @@ public class FileController {
         String fileName = request.getFileName();
         String filePath = Base64Util.generatePathRoot() + Base64Util.generatePath();
         Base64Util.createDir(filePath);
-        String fileNameLocal = System.currentTimeMillis() + fileName;
+        String fileNameLocal = System.currentTimeMillis() + "-" + fileName;
         Base64Util.decode(fileBase64, filePath + fileNameLocal);
         String id = fileAttachmentDAO.insert(
                 new FileAttachment(
