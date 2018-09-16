@@ -127,7 +127,15 @@ public class UserController {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.instance().check(token);
         String friendId = req.getFriendId();
-        friendDAO.denyFriend(friendId, userId);
+        friendDAO.denyFriend(userId, friendId);
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+    @PostMapping("/acceptfriend")
+    public ResponseEntity acceptFriend(@RequestHeader(name = "Authorization") String token, @RequestBody FriendRequest req) throws Exception {
+        Response response = new Response(ErrorCode.SUCCESS);
+        String userId = SessionManager.instance().check(token);
+        String friendId = req.getFriendId();
+        friendDAO.acceptFriend(userId, friendId);
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
