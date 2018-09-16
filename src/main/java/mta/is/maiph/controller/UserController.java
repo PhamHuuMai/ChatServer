@@ -8,10 +8,12 @@ package mta.is.maiph.controller;
 import java.util.LinkedList;
 import java.util.List;
 import mta.is.maiph.DAO.impl.ConversationDAO;
+import mta.is.maiph.DAO.impl.FriendDAO;
 import mta.is.maiph.DAO.impl.UserDAO;
 import mta.is.maiph.constant.ErrorCode;
 import mta.is.maiph.dto.request.AddMemberRequest;
 import mta.is.maiph.dto.request.AllFriendRequest;
+import mta.is.maiph.dto.request.FriendRequest;
 import mta.is.maiph.entity.User;
 import mta.is.maiph.exception.ApplicationException;
 import mta.is.maiph.repository.UserRepository;
@@ -39,8 +41,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController()
 public class UserController {
 
-    private UserRepository userRepository;
-    private UserDAO userDAO = new UserDAO();
+    private final UserRepository userRepository;
+    private final UserDAO userDAO = new UserDAO();
+    private final FriendDAO friendDAO = new FriendDAO();
+
     @Autowired
     public UserController(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -49,14 +53,13 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequest loginRequest) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
-        List<User> users = userRepository.findAll();
         User user = userRepository.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPasswordMd5());
         if (user == null) {
             throw new ApplicationException(ErrorCode.INVALID_ACCOUNT);
         }
         String token = TokenFactory.generateRandomToken();
         SessionManager.instance().add(token, user.getId());
-        response.setData(new LoginResponse(token, user.getEmail(), user.getId(),user.getName(),user.getAvatarUrl()));
+        response.setData(new LoginResponse(token, user.getEmail(), user.getId(), user.getName(), user.getAvatarUrl()));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
@@ -69,46 +72,78 @@ public class UserController {
         }
         String originalPass = regRequest.getPassword();
         String password = Util.MD5(originalPass);
-        user = new User(null, 
+        user = new User(null,
                 regRequest.getName(),
                 regRequest.getEmail(),
-                originalPass, password, 
+                originalPass, password,
                 Util.currentTIme_yyyyMMddhhmmss(),
                 "/2.png"
         );
         User result = userRepository.insert(user);
         String token = TokenFactory.generateRandomToken();
         SessionManager.instance().add(token, result.getId());
-        response.setData(new LoginResponse(token, user.getEmail(), result.getId(),result.getName(),result.getAvatarUrl()));
+        response.setData(new LoginResponse(token, user.getEmail(), result.getId(), result.getName(), result.getAvatarUrl()));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    @PostMapping("/getAllUser")
-    public ResponseEntity getAllUser(@RequestHeader(name = "Authorization") String token) throws Exception {
+    @PostMapping("/getAllFriend")
+    public ResponseEntity getAllFriend(@RequestHeader(name = "Authorization") String token) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.instance().check(token);
-        List<User> users = userRepository.findAll();
+        List<String> friends = friendDAO.listFriend(userId);
+        List<User> users = userRepository.findByIdIn(friends);
         List<UserResponse> userResponse = new LinkedList<>();
-        for (User user : users) {
+        users.forEach((user) -> {
             userResponse.add(new UserResponse(user));
-        }
+        });
         response.setData(userResponse);
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    @PostMapping("/addfriend")
-    public ResponseEntity addFriend(@RequestHeader(name = "Authorization") String token, @RequestBody AddMemberRequest request) throws Exception {
+    @PostMapping("/getAllRequestedFriend")
+    public ResponseEntity getAllRequestedFriend(@RequestHeader(name = "Authorization") String token) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.instance().check(token);
-        String cvsId = request.getCvsId();
-        String memberId = request.getMemberId();
-        // 
-
+        List<String> friends = friendDAO.listRequestFriend(userId);
+        List<User> users = userRepository.findByIdIn(friends);
+        List<UserResponse> userResponse = new LinkedList<>();
+        users.forEach((user) -> {
+            userResponse.add(new UserResponse(user));
+        });
+        response.setData(userResponse);
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    @PostMapping("/allfriend")
-    public ResponseEntity getFriend(@RequestHeader(name = "Authorization") String token, @RequestBody AllFriendRequest request) throws Exception {
+    @PostMapping("/requestfriend")
+    public ResponseEntity addFriend(@RequestHeader(name = "Authorization") String token, @RequestBody FriendRequest req) throws Exception {
+        Response response = new Response(ErrorCode.SUCCESS);
+        String userId = SessionManager.instance().check(token);
+        String friendId = req.getFriendId();
+        friendDAO.requestFriend(friendId, userId);
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/denyfriend")
+    public ResponseEntity denyFriend(@RequestHeader(name = "Authorization") String token, @RequestBody FriendRequest req) throws Exception {
+        Response response = new Response(ErrorCode.SUCCESS);
+        String userId = SessionManager.instance().check(token);
+        String friendId = req.getFriendId();
+        friendDAO.denyFriend(friendId, userId);
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/rejectfriend")
+    public ResponseEntity rejectFriend(@RequestHeader(name = "Authorization") String token, @RequestBody FriendRequest req) throws Exception {
+        Response response = new Response(ErrorCode.SUCCESS);
+        String userId = SessionManager.instance().check(token);
+        String friendId = req.getFriendId();
+        friendDAO.rejectFriend(userId, friendId);
+        friendDAO.rejectFriend(friendId, userId);
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/getAllUser")
+    public ResponseEntity getAllUser(@RequestHeader(name = "Authorization") String token, @RequestBody AllFriendRequest request) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.instance().check(token);
         String csvId = request.getCvsId();
@@ -133,5 +168,5 @@ public class UserController {
         userDAO.updateUserName(userId, name);
         return new ResponseEntity(response, HttpStatus.OK);
     }
-    
+
 }
