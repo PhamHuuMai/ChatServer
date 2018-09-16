@@ -36,13 +36,17 @@ public class FriendDAO extends AbstractDAO {
     public void acceptFriend(String userId, String friendId) {
         DBObject findUser = new BasicDBObject("_id", new ObjectId(userId));
         DBObject findFriend = new BasicDBObject("_id", new ObjectId(friendId));
+        
         DBObject addToSetUserObj = new BasicDBObject("$addToSet", new BasicDBObject("friends", friendId));
         DBObject pullUserObj = new BasicDBObject("$pull", new BasicDBObject("requests", friendId));
+        
         DBObject addToSetFriendObj = new BasicDBObject("$addToSet", new BasicDBObject("friends", userId));
         DBObject pullFriendObj = new BasicDBObject("$pull", new BasicDBObject("requests", userId));
+        
         getColection().update(findUser, addToSetUserObj, true, true);
         getColection().update(findUser, pullUserObj, true, true);
-        getColection().update(findFriend, pullUserObj, true, true);   
+        
+        getColection().update(findFriend, addToSetFriendObj, true, true);   
         getColection().update(findFriend, pullFriendObj, true, true);
     }
 
