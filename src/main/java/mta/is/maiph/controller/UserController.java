@@ -19,6 +19,7 @@ import mta.is.maiph.repository.UserRepository;
 import mta.is.maiph.dto.request.LoginRequest;
 import mta.is.maiph.dto.request.RegisterRequest;
 import mta.is.maiph.dto.request.RenameRequest;
+import mta.is.maiph.dto.request.SearchUserNameRequest;
 import mta.is.maiph.dto.response.LoginResponse;
 import mta.is.maiph.dto.response.Response;
 import mta.is.maiph.dto.response.UserResponse;
@@ -161,7 +162,21 @@ public class UserController {
         response.setData(userResponse);
         return new ResponseEntity(response, HttpStatus.OK);
     }
-
+    
+    @PostMapping("/searchUser")
+    public ResponseEntity searchUser(@RequestHeader(name = "Authorization") String token,@RequestBody SearchUserNameRequest request) throws Exception {
+        Response response = new Response(ErrorCode.SUCCESS);
+        String userId = SessionManager.instance().check(token);
+        String text = request.getText();
+        
+        List<User> users = userDAO.searchByName(text);
+        List<UserResponse> userResponse = new LinkedList<>();
+        users.forEach((user) -> {
+            userResponse.add(new UserResponse(user));
+        });
+        response.setData(userResponse);
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
     @PostMapping("/allfriend")
     public ResponseEntity getAllFriend(@RequestHeader(name = "Authorization") String token, @RequestBody AllFriendRequest request) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);

@@ -1,6 +1,7 @@
 package mta.is.maiph.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,6 +19,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Builder
 @Document(collection = "user")
 public class User {
     @Id
