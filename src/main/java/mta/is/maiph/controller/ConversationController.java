@@ -25,6 +25,7 @@ import mta.is.maiph.repository.UnreadRepository;
 import mta.is.maiph.repository.UserRepository;
 import mta.is.maiph.session.SessionManager;
 import mta.is.maiph.util.Util;
+import mta.is.maiph.worker.BackgroundThread;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,13 +41,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController()
 public class ConversationController {
 
-    private ConversationRepository conversationRepository;
-    private UnreadRepository unreadRepository;
-    private UserRepository userRepository;
-    private ContactTrackingDAO ct = new ContactTrackingDAO();
-    private MessageDAO msgDAO = new MessageDAO();
-    private UnreadMsgDAO unReadMsgDAO = new UnreadMsgDAO();
-    private ConversationDAO cvsDAO = ConversationDAO.instance();
+    private final ConversationRepository conversationRepository;
+    private final UnreadRepository unreadRepository;
+    private final UserRepository userRepository;
+    private final ContactTrackingDAO ct = new ContactTrackingDAO();
+    private final MessageDAO msgDAO = new MessageDAO();
+    private final UnreadMsgDAO unReadMsgDAO = new UnreadMsgDAO();
+    private final ConversationDAO cvsDAO = ConversationDAO.instance();
+
     @Autowired
     public ConversationController(ConversationRepository conversationRepository, UnreadRepository unreadRepository, UserRepository userRepository) {
         this.conversationRepository = conversationRepository;
@@ -64,24 +66,26 @@ public class ConversationController {
             System.out.println("==============================");
             return new ResponseEntity(response, HttpStatus.OK);
         }
-        // 
-        ct.add(userId, memeberId);
-        ct.add(memeberId, userId);
-        User user = userRepository.findById(userId).get();
-        User friend = userRepository.findById(memeberId).get();
-        //
-        Conversation cvs = new Conversation();
-        cvs.setAdminId(userId);
-        cvs.setLastChat(Util.currentTIme_yyyyMMddhhmmss());
-        cvs.setCreateTime(Util.currentTIme_yyyyMMddhhmmss());
-        cvs.setMembers(Arrays.asList(userId, memeberId));
-        cvs.setName("new conversation");
-        cvs.setGroup(false);
-        Conversation result = conversationRepository.insert(cvs);
-        //
-        unreadRepository.insert(new UnreadMessage(null, userId, result.getId(), friend.getName(), 0));
-        unreadRepository.insert(new UnreadMessage(null, memeberId, result.getId(), user.getName(), 0));
-        //
+        BackgroundThread.instance().execute(() -> {
+            //
+            ct.add(userId, memeberId);
+            ct.add(memeberId, userId);
+            User user = userRepository.findById(userId).get();
+            User friend = userRepository.findById(memeberId).get();
+            //
+            Conversation cvs = new Conversation();
+            cvs.setAdminId(userId);
+            cvs.setLastChat(Util.currentTIme_yyyyMMddhhmmss());
+            cvs.setCreateTime(Util.currentTIme_yyyyMMddhhmmss());
+            cvs.setMembers(Arrays.asList(userId, memeberId));
+            cvs.setName("new conversation");
+            cvs.setGroup(false);
+            Conversation result = conversationRepository.insert(cvs);
+            //
+            unreadRepository.insert(new UnreadMessage(null, userId, result.getId(), friend.getName(), 0));
+            unreadRepository.insert(new UnreadMessage(null, memeberId, result.getId(), user.getName(), 0));
+            //
+        });
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
@@ -102,26 +106,29 @@ public class ConversationController {
         if (members.contains(memeberId)) {
             return new ResponseEntity(response, HttpStatus.OK);
         }
-        members.add(memeberId);
-        if (!cvs.isGroup()) {
-            // create new group and add member
-            cvs.setId(null);
-            cvs.setLastChat("");
-            cvs.setCreateTime(Util.currentTIme_yyyyMMddhhmmss());
-            cvs.setMembers(members);
-            cvs.setName("new conversation");
-            cvs.setGroup(true);
-            Conversation result = conversationRepository.insert(cvs);
-            for (String member : members) {
-                unreadRepository.insert(new UnreadMessage(null, member, result.getId(), "new conversation", 0));
+        BackgroundThread.instance().execute(() -> {
+            members.add(memeberId);
+            if (!cvs.isGroup()) {
+                // create new group and add member
+                cvs.setId(null);
+                cvs.setLastChat("");
+                cvs.setCreateTime(Util.currentTIme_yyyyMMddhhmmss());
+                cvs.setMembers(members);
+                cvs.setName("new conversation");
+                cvs.setGroup(true);
+                Conversation result = conversationRepository.insert(cvs);
+                for (String member : members) {
+                    unreadRepository.insert(new UnreadMessage(null, member, result.getId(), "new conversation", 0));
+                }
+            } else {
+                // add member
+                cvs.setMembers(members);
+                conversationRepository.save(cvs);
+                //
+                unreadRepository.insert(new UnreadMessage(null, memeberId, cvsId, cvs.getName(), 0));
             }
-        } else {
-            // add member
-            cvs.setMembers(members);
-            conversationRepository.save(cvs);
-            //
-            unreadRepository.insert(new UnreadMessage(null, memeberId, cvsId, cvs.getName(), 0));
-        }
+        });
+
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
@@ -146,6 +153,7 @@ public class ConversationController {
         response.setData(resp);
         return new ResponseEntity(response, HttpStatus.OK);
     }
+
     @PostMapping("/getallconversation")
     public ResponseEntity getAllConversation(@RequestHeader(name = "Authorization") String token) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
@@ -159,7 +167,7 @@ public class ConversationController {
                     "/1.png",
                     cvs.getLastChat(),
                     um.getNumUnread(),
-                    cvs.getLastTimeAction()           
+                    cvs.getLastTimeAction()
             ));
         }
         response.setData(result);
@@ -172,7 +180,9 @@ public class ConversationController {
         String userId = SessionManager.instance().check(token);
         String cvsId = request.getCvsId();
         List<Message> result = msgDAO.getAllContent(cvsId);
-        unReadMsgDAO.read(userId, cvsId);
+        BackgroundThread.instance().execute(() -> {
+            unReadMsgDAO.read(userId, cvsId);
+        });
         response.setData(result);
         return new ResponseEntity(response, HttpStatus.OK);
     }
@@ -191,7 +201,9 @@ public class ConversationController {
             t.setName(u.getName());
             t.setAvatar(u.getAvatarUrl());
         });
-        unReadMsgDAO.read(userId, cvsId);
+        BackgroundThread.instance().execute(() -> {
+            unReadMsgDAO.read(userId, cvsId);
+        });
         response.setData(result);
         return new ResponseEntity(response, HttpStatus.OK);
     }
@@ -202,8 +214,10 @@ public class ConversationController {
         String userId = SessionManager.instance().check(token);
         String cvsId = request.getCvsId();
         String name = request.getName();
-        cvsDAO.updateName(cvsId, name);
-        unReadMsgDAO.rename(cvsId, name);
+        BackgroundThread.instance().execute(() -> {
+            cvsDAO.updateName(cvsId, name);
+            unReadMsgDAO.rename(cvsId, name);
+        });
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
