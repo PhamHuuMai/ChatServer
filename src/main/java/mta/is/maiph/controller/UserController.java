@@ -11,7 +11,6 @@ import mta.is.maiph.DAO.impl.ConversationDAO;
 import mta.is.maiph.DAO.impl.FriendDAO;
 import mta.is.maiph.DAO.impl.UserDAO;
 import mta.is.maiph.constant.ErrorCode;
-import mta.is.maiph.dto.request.AddMemberRequest;
 import mta.is.maiph.dto.request.AllFriendRequest;
 import mta.is.maiph.dto.request.FriendRequest;
 import mta.is.maiph.entity.User;
@@ -143,19 +142,29 @@ public class UserController {
     }
 
     @PostMapping("/getAllUser")
-    public ResponseEntity getAllUser(@RequestHeader(name = "Authorization") String token, @RequestBody AllFriendRequest request) throws Exception {
+    public ResponseEntity getAllUser(@RequestHeader(name = "Authorization") String token) throws Exception {
+        Response response = new Response(ErrorCode.SUCCESS);
+        String userId = SessionManager.instance().check(token);
+        List<User> users = userRepository.findAll();
+        List<UserResponse> userResponse = new LinkedList<>();
+        users.forEach((user) -> {
+            userResponse.add(new UserResponse(user));
+        });
+        response.setData(userResponse);
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/allfriend")
+    public ResponseEntity getAllFriend(@RequestHeader(name = "Authorization") String token, @RequestBody AllFriendRequest request) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.instance().check(token);
         String csvId = request.getCvsId();
         List<String> members = ConversationDAO.instance().getListMem(csvId);
         List<User> users = userRepository.findAll();
         List<UserResponse> userResponse = new LinkedList<>();
-
-        for (User user : users) {
-            if (!members.contains(user.getId())) {
-                userResponse.add(new UserResponse(user));
-            }
-        }
+        users.stream().filter((user) -> (!members.contains(user.getId()))).forEachOrdered((user) -> {
+            userResponse.add(new UserResponse(user));
+        });
         response.setData(userResponse);
         return new ResponseEntity(response, HttpStatus.OK);
     }
