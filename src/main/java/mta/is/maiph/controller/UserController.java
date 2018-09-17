@@ -206,11 +206,14 @@ public class UserController {
         String userId = SessionManager.instance().check(token);
         String csvId = request.getCvsId();
         List<String> members = ConversationDAO.instance().getListMem(csvId);
-        List<User> users = userRepository.findAll();
+        List<String> friends = friendDAO.listFriend(userId);
+        friends.removeAll(members);
+        List<User> users = userRepository.findByIdIn(friends);
         List<UserResponse> userResponse = new LinkedList<>();
-        users.stream().filter((user) -> (!members.contains(user.getId()))).forEachOrdered((user) -> {
-            userResponse.add(new UserResponse(user));
-        });
+        users.stream()
+                .forEachOrdered((user) -> {
+                    userResponse.add(new UserResponse(user));
+                });
         response.setData(userResponse);
         return new ResponseEntity(response, HttpStatus.OK);
     }
