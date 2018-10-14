@@ -23,6 +23,7 @@ import mta.is.maiph.dto.request.SearchUserNameRequest;
 import mta.is.maiph.dto.response.LoginResponse;
 import mta.is.maiph.dto.response.Response;
 import mta.is.maiph.dto.response.UserResponse;
+import mta.is.maiph.service.UserService;
 import mta.is.maiph.session.SessionManager;
 import mta.is.maiph.session.TokenFactory;
 import mta.is.maiph.util.Util;
@@ -42,19 +43,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController()
 public class UserController {
 
-    private final UserRepository userRepository;
-    private final UserDAO userDAO = new UserDAO();
-    private final FriendDAO friendDAO = new FriendDAO();
+//    private final UserRepository userRepository;
+//    private final UserDAO userDAO = new UserDAO();
+//    private final FriendDAO friendDAO = new FriendDAO();
+    private final UserService userService;
 
     @Autowired
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequest loginRequest) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
-        User user = userRepository.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPasswordMd5());
+        User user = userService.login(loginRequest.getEmail(), loginRequest.getPasswordMd5());
         if (user == null) {
             throw new ApplicationException(ErrorCode.INVALID_ACCOUNT);
         }
@@ -67,20 +69,21 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody RegisterRequest regRequest) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
-        User user = userRepository.findByEmail(regRequest.getEmail());
-        if (user != null) {
-            throw new ApplicationException(ErrorCode.INVALID_ACCOUNT);
-        }
+//        User user = userRepository.findByEmail(regRequest.getEmail());
+//        if (user != null) {
+//            throw new ApplicationException(ErrorCode.INVALID_ACCOUNT);
+//        }
         String originalPass = regRequest.getPassword();
         String password = Util.MD5(originalPass);
-        user = new User(null,
+        User user = new User(null,
                 regRequest.getName(),
                 regRequest.getEmail(),
                 originalPass, password,
                 Util.currentTIme_yyyyMMddhhmmss(),
                 "/2.png"
         );
-        User result = userRepository.insert(user);
+//        User result = userRepository.insert(user);
+        User result = userService.register(user);
         String token = TokenFactory.generateRandomToken();
         SessionManager.instance().add(token, result.getId());
         response.setData(new LoginResponse(token, user.getEmail(), result.getId(), result.getName(), result.getAvatarUrl()));
@@ -91,8 +94,9 @@ public class UserController {
     public ResponseEntity getAllFriend(@RequestHeader(name = "Authorization") String token) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.instance().check(token);
-        List<String> friends = friendDAO.listFriend(userId);
-        List<User> users = userRepository.findByIdIn(friends);
+//        List<String> friends = friendDAO.listFriend(userId);
+//        List<User> users = userRepository.findByIdIn(friends);
+        List<User> users = userService.getFriend(userId);
         List<UserResponse> userResponse = new LinkedList<>();
         users.forEach((user) -> {
             userResponse.add(new UserResponse(user));
@@ -105,8 +109,9 @@ public class UserController {
     public ResponseEntity getAllRequestedFriend(@RequestHeader(name = "Authorization") String token) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.instance().check(token);
-        List<String> friends = friendDAO.listRequestFriend(userId);
-        List<User> users = userRepository.findByIdIn(friends);
+//        List<String> friends = friendDAO.listRequestFriend(userId);
+//        List<User> users = userRepository.findByIdIn(friends);
+        List<User> users = userService.getRequestedFriend(userId);
         List<UserResponse> userResponse = new LinkedList<>();
         users.forEach((user) -> {
             userResponse.add(new UserResponse(user));
@@ -123,7 +128,8 @@ public class UserController {
         BackgroundThread.instance().execute(new Runnable() {
             @Override
             public void run() {
-                friendDAO.requestFriend(friendId, userId);
+//                friendDAO.requestFriend(friendId, userId);
+                userService.requestFriend(friendId, userId);
             }
         });
         return new ResponseEntity(response, HttpStatus.OK);
@@ -137,7 +143,8 @@ public class UserController {
         BackgroundThread.instance().execute(new Runnable() {
             @Override
             public void run() {
-                friendDAO.denyFriend(userId, friendId);
+//                friendDAO.denyFriend(userId, friendId);
+                userService.denyFriend(userId, friendId);
             }
         });
         return new ResponseEntity(response, HttpStatus.OK);
@@ -151,7 +158,8 @@ public class UserController {
         BackgroundThread.instance().execute(new Runnable() {
             @Override
             public void run() {
-                friendDAO.acceptFriend(userId, friendId);
+//                friendDAO.acceptFriend(userId, friendId);
+                userService.acceptFriend(userId, friendId);
             }
         });
         return new ResponseEntity(response, HttpStatus.OK);
@@ -165,8 +173,9 @@ public class UserController {
         BackgroundThread.instance().execute(new Runnable() {
             @Override
             public void run() {
-                friendDAO.rejectFriend(userId, friendId);
-                friendDAO.rejectFriend(friendId, userId);
+//                friendDAO.rejectFriend(userId, friendId);
+//                friendDAO.rejectFriend(friendId, userId);
+                userService.rejectFriend(userId, friendId);
             }
         });
         return new ResponseEntity(response, HttpStatus.OK);
@@ -176,7 +185,7 @@ public class UserController {
     public ResponseEntity getAllUser(@RequestHeader(name = "Authorization") String token) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.instance().check(token);
-        List<User> users = userRepository.findAll();
+        List<User> users = userService.getAllUser(userId); //userRepository.findAll();
         List<UserResponse> userResponse = new LinkedList<>();
         users.forEach((user) -> {
             userResponse.add(new UserResponse(user));
@@ -191,7 +200,7 @@ public class UserController {
         String userId = SessionManager.instance().check(token);
         String text = request.getText();
 
-        List<User> users = userDAO.searchByName(text);
+        List<User> users = userService.searchUser(text); //userDAO.searchByName(text);
         List<UserResponse> userResponse = new LinkedList<>();
         users.forEach((user) -> {
             userResponse.add(new UserResponse(user));
@@ -206,9 +215,10 @@ public class UserController {
         String userId = SessionManager.instance().check(token);
         String csvId = request.getCvsId();
         List<String> members = ConversationDAO.instance().getListMem(csvId);
-        List<String> friends = friendDAO.listFriend(userId);
-        friends.removeAll(members);
-        List<User> users = userRepository.findByIdIn(friends);
+//        List<String> friends = friendDAO.listFriend(userId);
+//        friends.removeAll(members);
+//        List<User> users = userRepository.findByIdIn(friends);
+        List<User> users = userService.getFriendExcep(userId, members);
         List<UserResponse> userResponse = new LinkedList<>();
         users.stream()
                 .forEachOrdered((user) -> {
@@ -224,7 +234,8 @@ public class UserController {
         String userId = SessionManager.instance().check(token);
         String name = request.getNewName();
         BackgroundThread.instance().execute(() -> {
-            userDAO.updateUserName(userId, name);
+//            userDAO.updateUserName(userId, name);
+            userService.updateUserName(userId, name);
         });
         return new ResponseEntity(response, HttpStatus.OK);
     }
