@@ -17,7 +17,7 @@ public class EventServiceImpl implements EventService {
     
     @Override
     public List<Event> getEvent(String conversationId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return eventDAO.get(conversationId);
     }
     
     @Override
