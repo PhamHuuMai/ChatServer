@@ -35,7 +35,7 @@ public class EventDAO extends AbstractDAO {
         List<Event> result = new ArrayList<>();
         DBObject findObj = new BasicDBObject("cvs_id", cvsId);
         DBObject sortObj = new BasicDBObject("action_time", 1);
-        sortObj.put("",1);
+//        sortObj.put("",1);
         try (DBCursor cursor = getColection().find(findObj).sort(sortObj)) {
             while (cursor.hasNext()) {
                 DBObject nextElement = cursor.next();
