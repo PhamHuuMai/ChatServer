@@ -12,6 +12,7 @@ import mta.is.maiph.dto.response.EventResponse;
 import mta.is.maiph.dto.response.Response;
 import mta.is.maiph.entity.Event;
 import mta.is.maiph.service.EventService;
+import mta.is.maiph.service.UserService;
 import mta.is.maiph.session.SessionManager;
 import mta.is.maiph.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +32,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController()
 @Slf4j
 public class EventController {
-    
+
     private final EventService eventService;
-    
+
+    private final UserService userService;
+
     @Autowired
-    public EventController(EventService eventService) {
+    public EventController(EventService eventService,UserService userService) {
         this.eventService = eventService;
+        this.userService = userService;
     }
-    
+
     @PostMapping("/getevent")
     public ResponseEntity getEvent(@RequestHeader(name = "Authorization") String token, @RequestBody AddEventRequest request) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
@@ -49,16 +53,16 @@ public class EventController {
                     .id(event.getId())
                     .content(event.getContent())
                     .title(event.getTitle())
-                    .actionTime("dfđfđfdf")
-                    .createTime("dffđfdf")
-                    .userName("đfdfdf")
+                    .actionTime(Util.format_yyyyMMdd(event.getActionTime()))
+                    .createTime(Util.format_yyyyMMdd(event.getCreateTime()))
+                    .userName(userService.getUserName(event.getUserId()))
                     .piority(event.getPiority())
                     .build());
         });
         response.setData(result);
         return new ResponseEntity(response, HttpStatus.OK);
     }
-    
+
     @PostMapping("/createevent")
     public ResponseEntity createEvent(@RequestHeader(name = "Authorization") String token, @RequestBody AddEventRequest request) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
@@ -75,7 +79,7 @@ public class EventController {
         eventService.addEvent(event);
         return new ResponseEntity(response, HttpStatus.OK);
     }
-    
+
     @PostMapping("/removeevent")
     public ResponseEntity removeEvent(@RequestHeader(name = "Authorization") String token, @RequestBody RemoveEventRequest request) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);

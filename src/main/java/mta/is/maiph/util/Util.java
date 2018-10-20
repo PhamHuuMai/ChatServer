@@ -85,4 +85,21 @@ public class Util {
         time.append(date.getSeconds());
         return time.toString();
     }
+    
+    public static String format_yyyyMMdd(long timeLong) {
+        Date date = new Date(timeLong);
+        StringBuilder time = new StringBuilder();
+        time.append(date.getYear() + 1900);
+        time.append("/");
+        time.append(date.getMonth() + 1);
+        time.append("/");
+        time.append(date.getDate());
+        time.append("-");
+        time.append(date.getHours());
+        time.append(":");
+        time.append(date.getMinutes());
+        time.append(":");
+        time.append(date.getSeconds());
+        return time.toString();
+    }
 }
