@@ -52,6 +52,7 @@ public class EventController {
                 .actionTime(Util.format_yyyyMMdd(request.getTime()))
                 .title(request.getTitle())
                 .content(request.getContent())
+                .piority(request.getPiority())
                 .createTime(System.currentTimeMillis())
                 .build();
         eventService.addEvent(event);

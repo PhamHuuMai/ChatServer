@@ -24,6 +24,7 @@ public class Event {
     String id;
     String title;
     String content;
+    int piority;
     Long createTime;
     Long actionTime;
     String userId;  
