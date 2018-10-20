@@ -13,6 +13,7 @@ public interface UserService {
     User login(String email,String password) throws ApplicationException;
     User register(User xUser) throws ApplicationException;
     void updateUserName(String userId, String newName);
+    String getUserName(String userId);
     
     List<User> getAllUser(String userId);
     List<User> searchUser(String keyName);

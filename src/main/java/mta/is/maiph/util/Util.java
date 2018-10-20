@@ -27,16 +27,45 @@ public class Util {
         return null;
     }
 
-    public static String currentTIme_yyyyMMddhhmmss(){
+    public static String currentTIme_yyyyMMddhhmmss() {
         Date date = new Date(System.currentTimeMillis());
         StringBuilder time = new StringBuilder();
-        time.append(date.getYear());
-        time.append(date.getMonth());
+        time.append(date.getYear() + 1900);
+        time.append(date.getMonth() + 1);
         time.append(date.getDate());
         time.append(date.getHours());
         time.append(date.getMinutes());
         time.append(date.getSeconds());
-        
+
+        return time.toString();
+    }
+
+    public static long format_yyyyMMddhhmmss(String yyyyMMddhhmmss) {
+        Date date = new Date();
+        int year = Integer.valueOf(yyyyMMddhhmmss.substring(0, 4)) - 1900;
+        date.setYear(year);
+        int month = Integer.valueOf(yyyyMMddhhmmss.substring(4, 6)) - 1;
+        date.setMonth(month);
+        int day = Integer.valueOf(yyyyMMddhhmmss.substring(6, 8));
+        date.setDate(day);
+        int hour = Integer.valueOf(yyyyMMddhhmmss.substring(8, 10));
+        date.setHours(hour);
+        int minute = Integer.valueOf(yyyyMMddhhmmss.substring(10, 12));
+        date.setMinutes(minute);
+        int sec = Integer.valueOf(yyyyMMddhhmmss.substring(12, 14));
+        date.setSeconds(sec);
+        return date.getTime();
+    }
+
+    public static String format_yyyyMMddhhmmss(long timeLong) {
+        Date date = new Date(timeLong);
+        StringBuilder time = new StringBuilder();
+        time.append(date.getYear() + 1900);
+        time.append(date.getMonth() + 1);
+        time.append(date.getDate());
+        time.append(date.getHours());
+        time.append(date.getMinutes());
+        time.append(date.getSeconds());
         return time.toString();
     }
 }

@@ -112,4 +112,9 @@ public class UserServiceImpl implements UserService {
         friendDAO.rejectFriend(friendId, userId);
     }
 
+    @Override
+    public String getUserName(String userId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }
