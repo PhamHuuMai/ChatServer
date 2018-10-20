@@ -1,10 +1,14 @@
 package mta.is.maiph.controller;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import mta.is.maiph.constant.ErrorCode;
 import mta.is.maiph.dto.request.AddEventRequest;
 import mta.is.maiph.dto.request.RemoveEventRequest;
 import mta.is.maiph.dto.request.UploadFileRequest;
+import mta.is.maiph.dto.response.EventResponse;
 import mta.is.maiph.dto.response.Response;
 import mta.is.maiph.entity.Event;
 import mta.is.maiph.service.EventService;
@@ -38,7 +42,20 @@ public class EventController {
     @PostMapping("/getevent")
     public ResponseEntity getEvent(@RequestHeader(name = "Authorization") String token, @RequestBody AddEventRequest request) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
-        
+        List<Event> events = eventService.getEvent(request.getCvsId());
+        List<EventResponse> result = new ArrayList<>();
+        events.forEach((event) -> {
+            result.add(EventResponse.builder()
+                    .id(event.getId())
+                    .content(event.getContent())
+                    .title(event.getTitle())
+                    .actionTime("dfđfđfdf")
+                    .createTime("dffđfdf")
+                    .userName("đfdfdf")
+                    .piority(event.getPiority())
+                    .build());
+        });
+        response.setData(result);
         return new ResponseEntity(response, HttpStatus.OK);
     }
     
