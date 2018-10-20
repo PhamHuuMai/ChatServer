@@ -49,7 +49,7 @@ public class EventController {
         Event event = Event.builder()
                 .userId(userId)
                 .cvsId(request.getCvsId())
-                .actionTime(Util.format_yyyyMMddhhmmss(request.getTime()))
+                .actionTime(Util.format_yyyyMMdd(request.getTime()))
                 .title(request.getTitle())
                 .content(request.getContent())
                 .createTime(System.currentTimeMillis())

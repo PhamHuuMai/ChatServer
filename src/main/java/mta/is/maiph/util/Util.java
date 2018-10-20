@@ -57,6 +57,23 @@ public class Util {
         return date.getTime();
     }
 
+    public static long format_yyyyMMdd(String yyyyMMdd) {
+        Date date = new Date();
+        int year = Integer.valueOf(yyyyMMdd.substring(0, 4)) - 1900;
+        date.setYear(year);
+        int month = Integer.valueOf(yyyyMMdd.substring(4, 6)) - 1;
+        date.setMonth(month);
+        int day = Integer.valueOf(yyyyMMdd.substring(6, 8));
+        date.setDate(day);
+        int hour = 0;
+        date.setHours(hour);
+        int minute = 0;
+        date.setMinutes(minute);
+        int sec = 0;
+        date.setSeconds(sec);
+        return date.getTime();
+    }
+
     public static String format_yyyyMMddhhmmss(long timeLong) {
         Date date = new Date(timeLong);
         StringBuilder time = new StringBuilder();
