@@ -2,6 +2,7 @@ package mta.is.maiph.worker;
 
 import java.io.IOException;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import mta.is.maiph.DAO.impl.ConversationDAO;
 import mta.is.maiph.DAO.impl.UserDAO;
 import mta.is.maiph.dto.connection.Message;
@@ -17,6 +18,7 @@ import org.springframework.web.socket.WebSocketSession;
  * @author MaiPH
  */
 @Service
+@Slf4j
 public class DirectMessageWorker extends Thread {
 
     private UserDAO userDAO = new UserDAO();
@@ -40,6 +42,7 @@ public class DirectMessageWorker extends Thread {
                 // send to all member in conversation
                 List<String> mem = cvtDAO.getListMem(cvsId);
                 JSONObject json = new JSONObject();
+                
                 json.put("msg_type", msg.getMessageType());
                 json.put("value", msg.getMessageValue());
                 json.put("to", cvsId);
@@ -50,6 +53,7 @@ public class DirectMessageWorker extends Thread {
                     List<WebSocketSession> des = WebsocketSessionManager.get(id);
                     for (WebSocketSession de : des) {
                         try {
+                            log.info("================333333============================== msg type " + msg.getMessageValue());
                             de.sendMessage(new TextMessage(json.toJSONString()));
                         } catch (IOException ex) {
 

@@ -91,7 +91,6 @@ public class MessageReceiver extends TextWebSocketHandler {
                     break;
                 }
                 case FileConstants.FILE_TYPE.OTHER:
-                    break;
                 case FileConstants.FILE_TYPE.IMAGE:
                 case FileConstants.FILE_TYPE.VIDEO:
                 case FileConstants.FILE_TYPE.AUDIO:
@@ -100,6 +99,7 @@ public class MessageReceiver extends TextWebSocketHandler {
                     String value = (String) msgJson.get("value");
                     String fileId = (String) msgJson.get("file_id");
                     Message msgDTO = new Message(userId, toConversation, msgType.intValue(), value);
+                    log.info("===|||=========================================== msg type " + msgTypeInt);
                     ReccieveMessageEntryPoint.instance().add(msgDTO);
                     msgDAO.add(toConversation, userId, value, msgType.intValue());
                     //
