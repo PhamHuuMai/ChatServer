@@ -54,17 +54,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController()
 @Slf4j
 public class FileController {
-
+    
     private final FileDAO fileDAO = new FileDAO();
     private final UserDAO userDAO = new UserDAO();
     private final FileAttachmentDAO fileAttachmentDAO = new FileAttachmentDAO();
     private final UserService userService;
-
+    
     @Autowired
     public FileController(UserService userService) {
         this.userService = userService;
     }
-
+    
     @PostMapping("/uploadavatar")
     public ResponseEntity upload(@RequestHeader(name = "Authorization") String token, @RequestBody UploadFileRequest request) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
@@ -83,10 +83,10 @@ public class FileController {
                         Base64Util.generatePath() + fileNameLocal,
                         System.currentTimeMillis()));
         userDAO.updateAvatar(userId, Base64Util.generatePath() + fileNameLocal);
-        response.setData(new UploadFileResponse(Base64Util.generatePath() + fileNameLocal, ""));
+        response.setData(new UploadFileResponse(Base64Util.generatePath() + fileNameLocal, "",3));
         return new ResponseEntity(response, HttpStatus.OK);
     }
-
+    
     @PostMapping("/uploadfileattachment")
     public ResponseEntity uploadFileAttachment(@RequestHeader(name = "Authorization") String token, @RequestBody UploadFileAttachmentRequest request) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
@@ -101,16 +101,33 @@ public class FileController {
                 new FileAttachment(
                         null,
                         userId,
-                        fileName, request.getMimeType(),
+                        fileName,
+                        request.getMimeType(),
                         Base64Util.generatePath() + fileNameLocal,
                         System.currentTimeMillis(),
                         request.getCvsId()
                 ));
-
-        response.setData(new UploadFileResponse(Base64Util.generatePath() + fileNameLocal, id));
+        
+        response.setData(new UploadFileResponse(Base64Util.generatePath() + fileNameLocal, id, getMediaType(request.getMimeType())));
         return new ResponseEntity(response, HttpStatus.OK);
     }
-
+    
+    private int getMediaType(String mimetype) {
+        if (mimetype == null) {
+            return FileConstants.FILE_TYPE.OTHER;
+        }
+        if (mimetype.contentEquals(new StringBuffer("image"))) {
+            return FileConstants.FILE_TYPE.IMAGE;
+        }
+        if (mimetype.contentEquals(new StringBuffer("video"))) {
+            return FileConstants.FILE_TYPE.VIDEO;
+        }
+        if (mimetype.contentEquals(new StringBuffer("audio"))) {
+            return FileConstants.FILE_TYPE.AUDIO;
+        }
+        return FileConstants.FILE_TYPE.OTHER;
+    }
+    
     @PostMapping("/getfileattachment")
     public ResponseEntity getFileAttachment(@RequestHeader(name = "Authorization") String token, @RequestBody UploadFileAttachmentRequest request) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
@@ -124,7 +141,7 @@ public class FileController {
             FileResponse fileResponse = FileResponse.builder()
                     .originalFileName(file.getOriginalFileName())
                     .time(Util.format_yyyyMMdd(file.getTime()))
-                    .url(FileConstants.HOST_FILE_ATT+file.getUrl())
+                    .url(FileConstants.HOST_FILE_ATT + file.getUrl())
                     .userName(userService.getUserName(file.getUserId()))
                     .build();
             result.add(fileResponse);
@@ -132,5 +149,5 @@ public class FileController {
         response.setData(result);
         return new ResponseEntity(response, HttpStatus.OK);
     }
-
+    
 }

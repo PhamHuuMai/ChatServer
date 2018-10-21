@@ -78,7 +78,7 @@ public class MessageReceiver extends TextWebSocketHandler {
                 String toConversation = (String) msgJson.get("to");
                 Message msgDTO = new Message(userId, toConversation, msgType.intValue(), "");
                 ReccieveMessageEntryPoint.instance().add(msgDTO);
-            } else if (msgType == 3) {  // file attchment msg 
+            } else if (msgType == 3 || msgType == 4 || msgType == 5 ) {  // file attchment msg 
                 String userId = WebsocketSessionManager.getUserId(session.getId());
                 String toConversation = (String) msgJson.get("to");
                 String value = (String) msgJson.get("value");

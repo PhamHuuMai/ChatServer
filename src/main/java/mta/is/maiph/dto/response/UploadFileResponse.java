@@ -23,4 +23,5 @@ import lombok.ToString;
 public class UploadFileResponse {
     String url;
     String fileId;
+    int type;
 }
