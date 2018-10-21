@@ -32,21 +32,21 @@ public abstract class BaseCacheManager {
     public BaseCache get(String id) throws ApplicationException {
         String key = getKey(id);
         try (Jedis jedis = getResource()) {
-            if (!getResource().exists(key)) {
+            if (!jedis.exists(key)) {
                 Map<String, String> data = initFromDB(id);
                 data.forEach((field, value) -> {
-                    getResource().hset(key, field, value);
+                    jedis.hset(key, field, value);
                 });
                 return castToEntity(data);
             }
-            return castToEntity(getResource().hgetAll(key));
+            return castToEntity(jedis.hgetAll(key));
         }
     }
 
     public void set(String id, String field, String value) {
         try (Jedis jedis = getResource()) {
             String key = getKey(id);
-            getResource().hset(key, field, value);
+            jedis.hset(key, field, value);
         }
     }
 
