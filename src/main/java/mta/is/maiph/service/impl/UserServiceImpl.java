@@ -126,6 +126,7 @@ public class UserServiceImpl implements UserService {
         } catch (Exception ex) {
             log.error("", ex);
         }
+        log.info(" userservice.getusername() ====== " + userId + " = " + userName);
         return userName;
     }
     

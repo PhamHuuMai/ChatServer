@@ -133,10 +133,8 @@ public class FileController {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.instance().check(token);
         String cvsId = request.getCvsId();
-        log.info("===================" + cvsId);
         List<File> files = fileAttachmentDAO.get(cvsId);
         List<FileResponse> result = new ArrayList<>();
-        log.info("===================" + files);
         files.forEach((file) -> {
             FileResponse fileResponse = FileResponse.builder()
                     .originalFileName(file.getOriginalFileName())
