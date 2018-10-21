@@ -10,14 +10,14 @@ import redis.clients.jedis.JedisPool;
  */
 public class RedisConnection {
 
-//    private JedisPool jedisPool;
-    private Jedis jedis;
+    private JedisPool jedisPool;
+//    private Jedis jedis;
 
     private static RedisConnection instance;
 
     private RedisConnection() {
-        //        this.jedisPool = new JedisPool(RedisConfig.HOST, RedisConfig.PORT);
-        jedis = new Jedis(RedisConfig.HOST, RedisConfig.PORT);
+        this.jedisPool = new JedisPool(RedisConfig.HOST, RedisConfig.PORT);
+//        jedis = new Jedis(RedisConfig.HOST, RedisConfig.PORT);
     }
 
     public static RedisConnection instance() {
@@ -28,7 +28,7 @@ public class RedisConnection {
     }
 
     public Jedis getResource() {
-//        return jedisPool.getResource();
-        return jedis;
+        return jedisPool.getResource();
+//        return jedis;
     }
 }

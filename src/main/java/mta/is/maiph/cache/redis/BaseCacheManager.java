@@ -29,22 +29,25 @@ public abstract class BaseCacheManager {
         return connections.getResource();
     }
 
-    public BaseCache get(String id) throws ApplicationException{
+    public BaseCache get(String id) throws ApplicationException {
         String key = getKey(id);
-        if (!getResource().exists(key)) {
-            log.info(" getDB === " +id);
-            Map<String, String> data = initFromDB(id);
-            data.forEach((field, value) -> {
-                getResource().hset(key, field, value);
-            });
-            return castToEntity(data);
+        try (Jedis jedis = getResource()) {
+            if (!getResource().exists(key)) {
+                Map<String, String> data = initFromDB(id);
+                data.forEach((field, value) -> {
+                    getResource().hset(key, field, value);
+                });
+                return castToEntity(data);
+            }
+            return castToEntity(getResource().hgetAll(key));
         }
-        return castToEntity(getResource().hgetAll(key));
     }
 
     public void set(String id, String field, String value) {
-        String key = getKey(id);
-        getResource().hset(key, field, value);
+        try (Jedis jedis = getResource()) {
+            String key = getKey(id);
+            getResource().hset(key, field, value);
+        }
     }
 
     protected abstract BaseCache castToEntity(Map<String, String> map);
