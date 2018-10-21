@@ -57,7 +57,7 @@ public class FileAttachmentDAO extends AbstractDAO {
         try (DBCursor cur = getColection().find(obj)) {
             while (cur.hasNext()) {
                 DBObject nextElement = cur.next();
-                result.add(castToFile(obj));
+                result.add(castToFile(nextElement));
             }
         }
         return result;
