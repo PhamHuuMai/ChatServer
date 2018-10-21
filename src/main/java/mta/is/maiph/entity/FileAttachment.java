@@ -19,7 +19,7 @@ public class FileAttachment extends File{
     String cvsId;
     boolean status = false;
 
-    public FileAttachment(String id, String userId, String originalFileName, String mimeType, String url, String time,String csvId) {
+    public FileAttachment(String id, String userId, String originalFileName, String mimeType, String url, Long time,String csvId) {
         super(id, userId, originalFileName, mimeType, url, time);
         this.cvsId = csvId;
     }

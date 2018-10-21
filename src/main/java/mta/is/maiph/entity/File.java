@@ -7,6 +7,7 @@ package mta.is.maiph.entity;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,12 +25,13 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PROTECTED)
 @ToString
+@Builder
 public class File {
     String id;
     String userId;
     String originalFileName;
     String mimeType;
     String url;
-    String time;
+    long time;
    
 }

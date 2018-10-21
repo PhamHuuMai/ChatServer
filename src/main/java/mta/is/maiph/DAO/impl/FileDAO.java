@@ -7,7 +7,10 @@ package mta.is.maiph.DAO.impl;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import java.util.ArrayList;
+import java.util.List;
 import mta.is.maiph.DAO.AbstractDAO;
 import mta.is.maiph.config.MongoConfig;
 import mta.is.maiph.entity.File;
@@ -27,13 +30,14 @@ public class FileDAO extends AbstractDAO {
     protected String colectionName() {
         return "file";
     }
-    
-    public void insert(File file){
-        DBObject obj = new BasicDBObject("user_id",file.getUserId());
+
+    public void insert(File file) {
+        DBObject obj = new BasicDBObject("user_id", file.getUserId());
         obj.put("url", file.getUrl());
         obj.put("mime_type", file.getMimeType());
         obj.put("original_name", file.getOriginalFileName());
         obj.put("time", System.currentTimeMillis());
         getColection().insert(obj);
     }
+
 }

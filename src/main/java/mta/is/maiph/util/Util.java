@@ -94,12 +94,12 @@ public class Util {
         time.append(date.getMonth() + 1);
         time.append("/");
         time.append(date.getDate());
-        time.append("-");
-        time.append(date.getHours());
-        time.append(":");
-        time.append(date.getMinutes());
-        time.append(":");
-        time.append(date.getSeconds());
+//        time.append("-");
+//        time.append(date.getHours());
+//        time.append(":");
+//        time.append(date.getMinutes());
+//        time.append(":");
+//        time.append(date.getSeconds());
         return time.toString();
     }
 }
