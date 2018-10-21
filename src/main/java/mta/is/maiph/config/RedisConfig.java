@@ -16,7 +16,7 @@ public class RedisConfig {
 //    public static String URI; 
     
 //    @Value("${spring.data.mongodb.host}")
-    public static final String HOST = "103.81.85.169"; 
+    public static final String HOST = "localhost"; 
 
 //    @Value("${spring.data.mongodb.port}")
     public static final int PORT = 6379; 
