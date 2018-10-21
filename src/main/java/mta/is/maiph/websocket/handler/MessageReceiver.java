@@ -21,31 +21,31 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
  * @author MaiPH
  */
 public class MessageReceiver extends TextWebSocketHandler {
-    
+
     static int i = 1;
     private static MessageDAO msgDAO = new MessageDAO();
     private static UnreadMsgDAO unreadMsgDAO = new UnreadMsgDAO();
     private static ConversationDAO cvsDAO = ConversationDAO.instance();
     private static FileAttachmentDAO fileAttDAO = new FileAttachmentDAO();
-    
+
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         super.afterConnectionClosed(session, status);
         WebsocketSessionManager.remove(session.getId());
     }
-    
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
-        
+
     }
-    
+
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
         super.handleTransportError(session, exception);
         WebsocketSessionManager.remove(session.getId());
     }
-    
+
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         try {
@@ -64,7 +64,7 @@ public class MessageReceiver extends TextWebSocketHandler {
                 String value = (String) msgJson.get("value");
                 Message msgDTO = new Message(userId, toConversation, msgType.intValue(), value);
                 ReccieveMessageEntryPoint.instance().add(msgDTO);
-                msgDAO.add(toConversation, userId, value,msgType.intValue());
+                msgDAO.add(toConversation, userId, value, msgType.intValue());
                 //
                 cvsDAO.updateLastMsg(toConversation, value);
                 //
@@ -78,14 +78,14 @@ public class MessageReceiver extends TextWebSocketHandler {
                 String toConversation = (String) msgJson.get("to");
                 Message msgDTO = new Message(userId, toConversation, msgType.intValue(), "");
                 ReccieveMessageEntryPoint.instance().add(msgDTO);
-            } else if (msgType == 3 || msgType == 4 || msgType == 5 ) {  // file attchment msg 
+            } else if (msgType == 3 || msgType == 4 || msgType == 5 || msgType == 6) {  // file attchment msg 
                 String userId = WebsocketSessionManager.getUserId(session.getId());
                 String toConversation = (String) msgJson.get("to");
                 String value = (String) msgJson.get("value");
                 String fileId = (String) msgJson.get("file_id");
                 Message msgDTO = new Message(userId, toConversation, msgType.intValue(), value);
                 ReccieveMessageEntryPoint.instance().add(msgDTO);
-                msgDAO.add(toConversation, userId, value,msgType.intValue());
+                msgDAO.add(toConversation, userId, value, msgType.intValue());
                 //
                 cvsDAO.updateLastMsg(toConversation, value);
                 //
@@ -101,7 +101,7 @@ public class MessageReceiver extends TextWebSocketHandler {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        
+
     }
-    
+
 }
