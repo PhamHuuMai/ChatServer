@@ -40,7 +40,7 @@ public class UserCacheManager extends BaseCacheManager {
     protected BaseCache castToEntity(Map<String, String> map) {
         UserCache userCache = UserCache.builder()
                 .email(map.get("email"))
-                .userName("user_name")
+                .userName(map.get("user_name"))
                 .avatar(map.get("avatar"))
                 .build();
         return userCache;
