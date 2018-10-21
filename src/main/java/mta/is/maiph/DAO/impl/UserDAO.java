@@ -58,14 +58,24 @@ public class UserDAO extends AbstractDAO {
         return result;
     }
 
+    public User get(String userId) {
+        DBObject data = getColection().findOne(new BasicDBObject("_id", new ObjectId(userId)));
+        if (data != null) {
+            return castToUser(data);
+        }
+        return null;
+    }
+
     private User castToUser(DBObject in) {
         String name = (String) in.get("name");
         String lastlogin = (String) in.get("last_time_login");
         String avatar = (String) in.get("avatar_url");
+        String email = (String) in.get("email");
         ObjectId id = (ObjectId) in.get("_id");
         return User.builder()
                 .avatarUrl(avatar)
                 .name(name)
+                .email(email)
                 .lastLogin(lastlogin)
                 .id(id.toHexString())
                 .build();

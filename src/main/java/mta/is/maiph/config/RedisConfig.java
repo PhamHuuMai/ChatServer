@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
  * @author MaiPH
  */
 @Configuration
-public class MongoConfig {
+public class RedisConfig {
     
 //    @Value("${spring.data.mongodb.uri}")
 //    public static String URI; 
@@ -19,7 +19,7 @@ public class MongoConfig {
     public static final String HOST = "103.81.85.169"; 
 
 //    @Value("${spring.data.mongodb.port}")
-    public static final int PORT = 27017; 
+    public static final int PORT = 6379; 
 //    @Value("${spring.data.mongodb.database}")
-    public static final String DB = "chat-db";
+  
 }
