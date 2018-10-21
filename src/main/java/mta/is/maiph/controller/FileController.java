@@ -116,13 +116,13 @@ public class FileController {
         if (mimetype == null) {
             return FileConstants.FILE_TYPE.OTHER;
         }
-        if (mimetype.contentEquals(new StringBuffer("image"))) {
+        if (mimetype.contains("image")) {
             return FileConstants.FILE_TYPE.IMAGE;
         }
-        if (mimetype.contentEquals(new StringBuffer("video"))) {
+        if (mimetype.contains("video")) {
             return FileConstants.FILE_TYPE.VIDEO;
         }
-        if (mimetype.contentEquals(new StringBuffer("audio"))) {
+        if (mimetype.contains("audio")) {
             return FileConstants.FILE_TYPE.AUDIO;
         }
         return FileConstants.FILE_TYPE.OTHER;
