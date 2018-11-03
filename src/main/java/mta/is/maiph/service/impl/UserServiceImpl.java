@@ -39,19 +39,19 @@ public class UserServiceImpl implements UserService {
     
     @Override
     public User register(User xUser) throws ApplicationException {
-        User user = userRepository.findByEmail(xUser.getEmail());
-        if (user != null) {
-            throw new ApplicationException(ErrorCode.INVALID_ACCOUNT);
-        }
-        String originalPass = xUser.getPassword();
-        String password = Util.MD5(originalPass);
-        user = new User(null,
-                xUser.getName(),
-                xUser.getEmail(),
-                originalPass, password,
-                Util.currentTIme_yyyyMMddhhmmss(),
-                "/2.png"
-        );
+//        User user = userRepository.findByEmail(xUser.getEmail());
+//        if (user != null) {
+//            throw new ApplicationException(ErrorCode.INVALID_ACCOUNT);
+//        }
+//        String originalPass = xUser.getPassword();
+//        String password = Util.MD5(originalPass);
+//        user = new User(null,
+//                xUser.getName(),
+//                xUser.getEmail(),
+//                originalPass, password,
+//                Util.currentTIme_yyyyMMddhhmmss(),
+//                "/2.png"
+//        );
         User result = userRepository.insert(user);
         return result;
     }

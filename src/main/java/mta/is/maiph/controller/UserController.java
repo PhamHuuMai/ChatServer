@@ -69,10 +69,10 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody RegisterRequest regRequest) throws Exception {
         Response response = new Response(ErrorCode.SUCCESS);
-//        User user = userRepository.findByEmail(regRequest.getEmail());
-//        if (user != null) {
-//            throw new ApplicationException(ErrorCode.INVALID_ACCOUNT);
-//        }
+        User user = userRepository.findByEmail(regRequest.getEmail());
+        if (user != null) {
+            throw new ApplicationException(ErrorCode.INVALID_ACCOUNT);
+        }
         String originalPass = regRequest.getPassword();
         String password = Util.MD5(originalPass);
         User user = new User(null,
