@@ -39,10 +39,10 @@ public class UserServiceImpl implements UserService {
     
     @Override
     public User register(User xUser) throws ApplicationException {
-//        User user = userRepository.findByEmail(xUser.getEmail());
-//        if (user != null) {
-//            throw new ApplicationException(ErrorCode.INVALID_ACCOUNT);
-//        }
+        User user = userRepository.findByEmail(xUser.getEmail());
+        if (user != null) {
+            throw new ApplicationException(ErrorCode.INVALID_ACCOUNT);
+        }
 //        String originalPass = xUser.getPassword();
 //        String password = Util.MD5(originalPass);
 //        user = new User(null,
@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
 //                Util.currentTIme_yyyyMMddhhmmss(),
 //                "/2.png"
 //        );
-        User result = userRepository.insert(user);
+        User result = userRepository.insert(xUser);
         return result;
     }
     
