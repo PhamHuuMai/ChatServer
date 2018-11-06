@@ -129,7 +129,7 @@ public class UserController {
             @Override
             public void run() {
 //                friendDAO.requestFriend(friendId, userId);
-                userService.requestFriend(friendId, userId);
+                userService.requestFriend(userId, friendId);
             }
         });
         return new ResponseEntity(response, HttpStatus.OK);
