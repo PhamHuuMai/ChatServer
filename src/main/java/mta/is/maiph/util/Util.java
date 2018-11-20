@@ -13,6 +13,33 @@ import java.util.Date;
  */
 public class Util {
 
+    static long A_DAY = 24 * 60 * 60 * 1000;
+    static long A_HOUR = 60 * 60 * 1000;
+    static long A_MIN = 60 * 1000;
+    static long A_SEC = 1000;
+
+    public static String getLastOnline(long offset) {
+        long dayPer = offset / A_DAY;
+        String prefix = "";
+        if (dayPer >= 1) {
+            prefix = dayPer+"ngày trước";
+        } else {
+            long hourPer = offset / A_HOUR;
+            if (hourPer >= 1) {
+                prefix = hourPer + "giờ trước";
+            } else {
+                long minPer = offset / A_MIN;
+                if (minPer >= 1) {
+                    prefix = minPer + "phút trước";
+                } else {
+                    long secPer = offset / A_SEC;
+                    prefix = secPer + "giây trước";
+                }
+            }
+        }
+        return prefix;
+    }
+
     public static String MD5(String md5) {
         try {
             java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
@@ -85,7 +112,7 @@ public class Util {
         time.append(date.getSeconds());
         return time.toString();
     }
-    
+
     public static String format_yyyyMMdd(long timeLong) {
         Date date = new Date(timeLong);
         StringBuilder time = new StringBuilder();
