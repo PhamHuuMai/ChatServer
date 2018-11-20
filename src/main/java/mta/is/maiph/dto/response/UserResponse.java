@@ -36,6 +36,6 @@ public class UserResponse {
         String prefix = "Online ";
         long lastlogin = Util.format_yyyyMMddhhmmss(lastLoginStr);
         long cur = System.currentTimeMillis();
-        return prefix + Util.getLastOnline(cur - lastlogin);
+        return prefix + Util.getLastOnline(cur - Math.abs(lastlogin));
     }
 }
