@@ -32,6 +32,7 @@ public class UserResponse {
     }
 
     private String timeStringFormat(String lastLoginStr) {
+        lastLoginStr = lastLoginStr +"00000000000000000";
         String prefix = "Online ";
         long lastlogin = Util.format_yyyyMMddhhmmss(lastLoginStr);
         long cur = System.currentTimeMillis();
