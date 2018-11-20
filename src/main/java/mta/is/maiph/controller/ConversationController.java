@@ -3,10 +3,14 @@ package mta.is.maiph.controller;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import mta.is.maiph.DAO.impl.ContactTrackingDAO;
 import mta.is.maiph.DAO.impl.ConversationDAO;
 import mta.is.maiph.DAO.impl.MessageDAO;
 import mta.is.maiph.DAO.impl.UnreadMsgDAO;
+import mta.is.maiph.cache.UserCache;
+import mta.is.maiph.cache.redis.UserCacheManager;
 import mta.is.maiph.constant.ErrorCode;
 import mta.is.maiph.dto.request.AddConversationRequest;
 import mta.is.maiph.dto.request.AddMemberRequest;
@@ -20,6 +24,7 @@ import mta.is.maiph.entity.Conversation;
 import mta.is.maiph.entity.Message;
 import mta.is.maiph.entity.UnreadMessage;
 import mta.is.maiph.entity.User;
+import mta.is.maiph.exception.ApplicationException;
 import mta.is.maiph.repository.ConversationRepository;
 import mta.is.maiph.repository.UnreadRepository;
 import mta.is.maiph.repository.UserRepository;
@@ -78,7 +83,7 @@ public class ConversationController {
             cvs.setLastChat(Util.currentTIme_yyyyMMddhhmmss());
             cvs.setCreateTime(Util.currentTIme_yyyyMMddhhmmss());
             cvs.setMembers(Arrays.asList(userId, memeberId));
-            cvs.setName("new conversation");
+            cvs.setName(createCVSname(Arrays.asList(userId, memeberId)));
             cvs.setGroup(false);
             Conversation result = conversationRepository.insert(cvs);
             //
@@ -114,7 +119,7 @@ public class ConversationController {
                 cvs.setLastChat("");
                 cvs.setCreateTime(Util.currentTIme_yyyyMMddhhmmss());
                 cvs.setMembers(members);
-                cvs.setName("new conversation");
+                cvs.setName(createCVSname(members));
                 cvs.setGroup(true);
                 Conversation result = conversationRepository.insert(cvs);
                 for (String member : members) {
@@ -221,4 +226,19 @@ public class ConversationController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
+    private String createCVSname(List<String> userIds) {
+        StringBuilder result = new StringBuilder();
+        userIds.forEach((t) -> {
+            try {
+                String userName = ((UserCache) UserCacheManager.instance().get(t)).getUserName();
+                if (userName != null) {
+                    result.append(userName);
+                    result.append(",");
+                }
+            } catch (ApplicationException ex) {
+                Logger.getLogger(ConversationController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
+        return result.toString().isEmpty()? "new conversation" : result.toString();
+    }
 }
