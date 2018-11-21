@@ -125,6 +125,9 @@ public class UserController {
         Response response = new Response(ErrorCode.SUCCESS);
         String userId = SessionManager.instance().check(token);
         String friendId = req.getFriendId();
+        if (userId.equals(friendId)) {
+            return new ResponseEntity(response, HttpStatus.OK);
+        }
         BackgroundThread.instance().execute(new Runnable() {
             @Override
             public void run() {
