@@ -32,10 +32,10 @@ public class UserResponse {
     }
 
     private String timeStringFormat(String lastLoginStr) {
-        lastLoginStr = lastLoginStr + "00";
+        lastLoginStr = lastLoginStr + "00000000000000";
         String prefix = "Online ";
         long lastlogin = Util.format_yyyyMMddhhmmss(lastLoginStr);
-        long cur = Util.format_yyyyMMddhhmmss(Util.format_yyyyMMddhhmmss(System.currentTimeMillis())+"00");
+        long cur = Util.format_yyyyMMddhhmmss(Util.format_yyyyMMddhhmmss(System.currentTimeMillis())+"00000000000000");
         return prefix + Util.getLastOnline(Math.abs(cur - lastlogin));
     }
 }
